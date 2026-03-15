@@ -8,6 +8,7 @@ import pl.skyroster.skyroster_backend.generated.model.UserInfo;
 
 import java.util.List;
 
+// TODO: Temporary stub controller — replace with real implementation
 @RestController
 public class AdminController {
 

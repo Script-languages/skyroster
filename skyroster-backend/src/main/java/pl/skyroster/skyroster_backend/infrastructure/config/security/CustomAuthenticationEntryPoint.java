@@ -10,11 +10,17 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import pl.skyroster.skyroster_backend.generated.model.ErrorResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.time.OffsetDateTime;
 
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
+    private static final String GENERIC_MESSAGE = "Authentication is required to access this resource";
 
     private final ObjectMapper objectMapper;
 
@@ -25,12 +31,14 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
+        log.warn("Authentication failed for {}: {}", request.getRequestURI(), authException.getMessage());
+
         HttpStatus status = HttpStatus.UNAUTHORIZED;
 
         ErrorResponse error = new ErrorResponse()
                 .status(status.value())
                 .error(status.getReasonPhrase())
-                .message(authException.getMessage())
+                .message(GENERIC_MESSAGE)
                 .timestamp(OffsetDateTime.now())
                 .path(request.getRequestURI());
 

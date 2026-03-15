@@ -9,6 +9,7 @@ import pl.skyroster.skyroster_backend.generated.model.Schedule;
 import java.time.LocalDate;
 import java.util.List;
 
+// TODO: Temporary stub controller — replace with real implementation
 @RestController
 public class PlanningController {
 

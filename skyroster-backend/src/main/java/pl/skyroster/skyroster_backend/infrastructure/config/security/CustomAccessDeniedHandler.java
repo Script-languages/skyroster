@@ -10,11 +10,17 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import pl.skyroster.skyroster_backend.generated.model.ErrorResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.time.OffsetDateTime;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
+    private static final String GENERIC_MESSAGE = "You do not have permission to access this resource";
 
     private final ObjectMapper objectMapper;
 
@@ -25,12 +31,14 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException {
+        log.warn("Access denied for {}: {}", request.getRequestURI(), accessDeniedException.getMessage());
+
         HttpStatus status = HttpStatus.FORBIDDEN;
 
         ErrorResponse error = new ErrorResponse()
                 .status(status.value())
                 .error(status.getReasonPhrase())
-                .message(accessDeniedException.getMessage())
+                .message(GENERIC_MESSAGE)
                 .timestamp(OffsetDateTime.now())
                 .path(request.getRequestURI());
 

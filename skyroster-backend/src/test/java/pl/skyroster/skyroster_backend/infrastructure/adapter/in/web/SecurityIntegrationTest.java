@@ -8,11 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.skyroster.skyroster_backend.TestcontainersConfiguration;
 
 import java.net.URI;
@@ -24,28 +20,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
 @Import(TestcontainersConfiguration.class)
 class SecurityIntegrationTest {
-
-    @Container
-    static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:26.2")
-            .withRealmImportFile("keycloak/realm-export.json");
 
     @Autowired
     private MockMvc mockMvc;
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private KeycloakContainer keycloak;
 
-    @DynamicPropertySource
-    static void keycloakProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
-                () -> keycloak.getAuthServerUrl() + "/realms/skyroster");
-    }
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void healthEndpoint_shouldBeAccessibleWithoutToken() throws Exception {

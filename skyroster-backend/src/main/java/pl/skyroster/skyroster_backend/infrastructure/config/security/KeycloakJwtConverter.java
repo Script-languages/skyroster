@@ -22,7 +22,7 @@ public class KeycloakJwtConverter implements Converter<Jwt, AbstractAuthenticati
         return new JwtAuthenticationToken(jwt, authorities);
     }
 
-    private Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
+    private static Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
         Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
         if (realmAccess == null) {
             return Collections.emptyList();
