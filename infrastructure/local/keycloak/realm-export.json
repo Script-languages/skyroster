@@ -1,0 +1,51 @@
+{
+  "realm": "skyroster",
+  "enabled": true,
+  "sslRequired": "none",
+  "roles": {
+    "realm": [
+      { "name": "operations_administrator", "composite": false },
+      { "name": "compliance_officer", "composite": false },
+      { "name": "schedule_planner", "composite": false }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "skyroster-frontend",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:5173"],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@skyroster.local",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "test1234", "temporary": false }],
+      "realmRoles": ["operations_administrator"]
+    },
+    {
+      "username": "compliance",
+      "email": "compliance@skyroster.local",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "test1234", "temporary": false }],
+      "realmRoles": ["compliance_officer"]
+    },
+    {
+      "username": "schedule_planner",
+      "email": "schedule_planner@skyroster.local",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "test1234", "temporary": false }],
+      "realmRoles": ["schedule_planner"]
+    }
+  ],
+  "accessTokenLifespan": 900,
+  "ssoSessionMaxLifespan": 86400
+}
