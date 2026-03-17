@@ -38,7 +38,7 @@ class SecurityIntegrationTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void healthEndpoint_shouldBeAccessibleWithoutToken() throws Exception {
+    void healthEndpoint_shouldBeAccessible_whenNoToken() throws Exception {
         mockMvc.perform(get("/api/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"));
