@@ -8,14 +8,14 @@
 ## Running locally
 
 ```bash
-# 1. Database
-cp .env-template .env   # fill in or keep defaults
-docker compose -f infrastructure/local/docker-compose.yaml --profile db up -d
+# 1. Copy environment file (defaults work out of the box)
+cp .env-template .env
 
-# 2. Backend
+# 2. Start infrastructure (PostgreSQL + Keycloak)
+docker compose -f infrastructure/local/docker-compose.yaml --profile backend up -d
+
+# 3. Backend
 cd skyroster-backend
 ./mvnw spring-boot:run
 ```
 
-API: http://localhost:8080
-Swagger: http://localhost:8080/swagger-ui.html

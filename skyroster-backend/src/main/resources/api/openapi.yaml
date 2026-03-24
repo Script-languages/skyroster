@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: SkyRoster API
+  description: Pilot schedule conflict detection system
+  version: 0.1.0
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      tags: [Health]
+      summary: Health check
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  /api/me:
+    get:
+      operationId: getCurrentUser
+      tags: [User]
+      summary: Get current authenticated user info
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users:
+    get:
+      operationId: getAdminUsers
+      tags: [Admin]
+      summary: List users (admin only)
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserInfo'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/compliance/reports:
+    get:
+      operationId: getComplianceReports
+      tags: [Compliance]
+      summary: List compliance reports
+      responses:
+        '200':
+          description: List of compliance reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComplianceReport'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/planning/schedules:
+    get:
+      operationId: getPlanningSchedules
+      tags: [Planning]
+      summary: List schedules
+      responses:
+        '200':
+          description: List of schedules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - error
+        - message
+        - timestamp
+        - path
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+          example: 401
+        error:
+          type: string
+          description: Error name
+          example: "Unauthorized"
+        message:
+          type: string
+          description: Human-readable error description
+          example: "JWT token has expired"
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the error occurrence
+        path:
+          type: string
+          description: Request path
+          example: "/api/admin/users"
+
+    UserInfo:
+      type: object
+      required:
+        - username
+        - email
+        - roles
+      properties:
+        username:
+          type: string
+          description: Username from JWT token
+          example: "admin"
+        email:
+          type: string
+          description: User email address
+          example: "admin@skyroster.local"
+        roles:
+          type: array
+          description: List of realm roles assigned to the user
+          items:
+            type: string
+          example: ["operations_administrator"]
+
+    HealthStatus:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Service health status
+          example: "UP"
+
+    ComplianceReport:
+      type: object
+      required:
+        - id
+        - title
+        - status
+      properties:
+        id:
+          type: string
+          example: "CR-001"
+        title:
+          type: string
+          example: "Monthly flight hours compliance"
+        status:
+          type: string
+          example: "PASSED"
+
+    Schedule:
+      type: object
+      required:
+        - id
+        - pilotName
+        - date
+      properties:
+        id:
+          type: string
+          example: "SCH-001"
+        pilotName:
+          type: string
+          example: "Jan Kowalski"
+        date:
+          type: string
+          format: date
+          example: "2026-03-20"
