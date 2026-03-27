@@ -2,6 +2,7 @@ package pl.skyroster.skyroster_backend.infrastructure.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -46,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("operations_administrator")
                         .requestMatchers("/api/compliance/**").hasRole("compliance_officer")
                         .requestMatchers("/api/planning/**").hasRole("schedule_planner")
+                        .requestMatchers(HttpMethod.POST, "/api/aircraft/**").hasRole("operations_administrator")
+                        .requestMatchers(HttpMethod.GET, "/api/aircraft/**").authenticated()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll()
                 )
