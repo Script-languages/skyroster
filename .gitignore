@@ -16,7 +16,7 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
-# Node (frontend)
+# Node (skyroster-frontend)
 node_modules/
 dist/
 .next/
