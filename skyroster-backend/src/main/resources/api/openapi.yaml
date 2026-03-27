@@ -122,6 +122,68 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/aircraft:
+    post:
+      operationId: addAircraft
+      tags: [Aircraft]
+      summary: Add a new aircraft to the fleet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddAircraftRequest'
+      responses:
+        '201':
+          description: Aircraft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AircraftResponse'
+        '400':
+          description: Bad request (invalid type or base)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Aircraft with this registration already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      operationId: getAircraft
+      tags: [Aircraft]
+      summary: List all aircraft in the fleet
+      responses:
+        '200':
+          description: List of aircraft
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AircraftResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -226,3 +288,76 @@ components:
           type: string
           format: date
           example: "2026-03-20"
+
+    AddAircraftRequest:
+      type: object
+      required:
+        - registrationNumber
+        - aircraftTypeId
+        - operationalBaseId
+      properties:
+        registrationNumber:
+          type: string
+          description: Aircraft registration number
+          example: "SP-LRA"
+        aircraftTypeId:
+          type: string
+          format: uuid
+          description: ID of the aircraft type
+        operationalBaseId:
+          type: string
+          format: uuid
+          description: ID of the operational base
+
+    AircraftTypeInfo:
+      type: object
+      required:
+        - id
+        - icaoCode
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        icaoCode:
+          type: string
+          example: "B738"
+        name:
+          type: string
+          example: "Boeing 737-800"
+
+    OperationalBaseInfo:
+      type: object
+      required:
+        - id
+        - icaoCode
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        icaoCode:
+          type: string
+          example: "EPWA"
+        name:
+          type: string
+          example: "Warsaw Chopin"
+
+    AircraftResponse:
+      type: object
+      required:
+        - id
+        - registrationNumber
+        - aircraftType
+        - operationalBase
+      properties:
+        id:
+          type: string
+          format: uuid
+        registrationNumber:
+          type: string
+          example: "SP-LRA"
+        aircraftType:
+          $ref: '#/components/schemas/AircraftTypeInfo'
+        operationalBase:
+          $ref: '#/components/schemas/OperationalBaseInfo'
