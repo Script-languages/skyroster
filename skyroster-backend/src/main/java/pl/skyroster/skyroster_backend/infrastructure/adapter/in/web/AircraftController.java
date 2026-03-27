@@ -32,8 +32,8 @@ public class AircraftController {
     public ResponseEntity<AircraftResponse> addAircraft(@RequestBody AddAircraftRequest request) {
         Aircraft aircraft = addAircraftUseCase.execute(
                 request.getRegistrationNumber(),
-                request.getAircraftTypeId(),
-                request.getOperationalBaseId()
+                request.getAircraftTypeCode(),
+                request.getOperationalBaseCode()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(aircraft));
     }

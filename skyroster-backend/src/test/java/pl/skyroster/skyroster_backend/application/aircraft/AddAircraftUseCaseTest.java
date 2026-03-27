@@ -35,12 +35,12 @@ class AddAircraftUseCaseTest {
 
     private AddAircraftUseCase useCase;
 
-    private static final UUID TYPE_ID = UUID.randomUUID();
-    private static final UUID BASE_ID = UUID.randomUUID();
+    private static final String TYPE_CODE = "B738";
+    private static final String BASE_CODE = "EPWA";
     private static final String REGISTRATION = "SP-LRA";
 
-    private final AircraftType type = new AircraftType(TYPE_ID, "B738", "Boeing 737-800");
-    private final OperationalBase base = new OperationalBase(BASE_ID, "EPWA", "Warsaw Chopin");
+    private final AircraftType type = new AircraftType(UUID.randomUUID(), TYPE_CODE, "Boeing 737-800");
+    private final OperationalBase base = new OperationalBase(UUID.randomUUID(), BASE_CODE, "Warsaw Chopin");
 
     @BeforeEach
     void setUp() {
@@ -50,11 +50,11 @@ class AddAircraftUseCaseTest {
     @Test
     void shouldAddAircraft_whenValidData() {
         when(aircraftRepository.existsByRegistrationNumber(REGISTRATION)).thenReturn(false);
-        when(aircraftTypeRepository.findById(TYPE_ID)).thenReturn(Optional.of(type));
-        when(operationalBaseRepository.findById(BASE_ID)).thenReturn(Optional.of(base));
+        when(aircraftTypeRepository.findByIcaoCode(TYPE_CODE)).thenReturn(Optional.of(type));
+        when(operationalBaseRepository.findByIcaoCode(BASE_CODE)).thenReturn(Optional.of(base));
         when(aircraftRepository.save(any(Aircraft.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Aircraft result = useCase.execute(REGISTRATION, TYPE_ID, BASE_ID);
+        Aircraft result = useCase.execute(REGISTRATION, TYPE_CODE, BASE_CODE);
 
         assertThat(result.getRegistrationNumber()).isEqualTo(REGISTRATION);
         assertThat(result.getAircraftType()).isEqualTo(type);
@@ -67,7 +67,7 @@ class AddAircraftUseCaseTest {
     void shouldThrow_whenRegistrationAlreadyExists() {
         when(aircraftRepository.existsByRegistrationNumber(REGISTRATION)).thenReturn(true);
 
-        assertThatThrownBy(() -> useCase.execute(REGISTRATION, TYPE_ID, BASE_ID))
+        assertThatThrownBy(() -> useCase.execute(REGISTRATION, TYPE_CODE, BASE_CODE))
                 .isInstanceOf(AircraftAlreadyExistsException.class)
                 .hasMessageContaining(REGISTRATION);
     }
@@ -75,25 +75,25 @@ class AddAircraftUseCaseTest {
     @Test
     void shouldThrow_whenAircraftTypeNotFound() {
         when(aircraftRepository.existsByRegistrationNumber(REGISTRATION)).thenReturn(false);
-        when(aircraftTypeRepository.findById(TYPE_ID)).thenReturn(Optional.empty());
+        when(aircraftTypeRepository.findByIcaoCode(TYPE_CODE)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> useCase.execute(REGISTRATION, TYPE_ID, BASE_ID))
+        assertThatThrownBy(() -> useCase.execute(REGISTRATION, TYPE_CODE, BASE_CODE))
                 .isInstanceOf(AircraftTypeNotFoundException.class);
     }
 
     @Test
     void shouldThrow_whenOperationalBaseNotFound() {
         when(aircraftRepository.existsByRegistrationNumber(REGISTRATION)).thenReturn(false);
-        when(aircraftTypeRepository.findById(TYPE_ID)).thenReturn(Optional.of(type));
-        when(operationalBaseRepository.findById(BASE_ID)).thenReturn(Optional.empty());
+        when(aircraftTypeRepository.findByIcaoCode(TYPE_CODE)).thenReturn(Optional.of(type));
+        when(operationalBaseRepository.findByIcaoCode(BASE_CODE)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> useCase.execute(REGISTRATION, TYPE_ID, BASE_ID))
+        assertThatThrownBy(() -> useCase.execute(REGISTRATION, TYPE_CODE, BASE_CODE))
                 .isInstanceOf(OperationalBaseNotFoundException.class);
     }
 
     @Test
     void shouldThrow_whenRegistrationIsBlank() {
-        assertThatThrownBy(() -> useCase.execute("", TYPE_ID, BASE_ID))
+        assertThatThrownBy(() -> useCase.execute("", TYPE_CODE, BASE_CODE))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Registration number");
     }

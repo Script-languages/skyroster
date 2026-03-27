@@ -219,7 +219,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"registrationNumber\": \"SP-LRA\",\n  \"aircraftTypeId\": \"\",\n  \"operationalBaseId\": \"\"\n}"
+              "raw": "{\n  \"registrationNumber\": \"SP-LRA\",\n  \"aircraftTypeCode\": \"B738\",\n  \"operationalBaseCode\": \"EPWA\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/aircraft",

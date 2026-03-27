@@ -36,20 +36,16 @@ class AircraftIntegrationTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Seed UUIDs from V2 migration
-    private static final String TYPE_B738_ID = "b0000000-0000-0000-0000-000000000001";
-    private static final String BASE_EPWA_ID = "a0000000-0000-0000-0000-000000000001";
-
     @Test
     void addAircraft_shouldReturn201_whenAdminWithValidData() throws Exception {
         String token = getToken("admin", "test1234");
         String body = """
                 {
                     "registrationNumber": "SP-LRA",
-                    "aircraftTypeId": "%s",
-                    "operationalBaseId": "%s"
+                    "aircraftTypeCode": "B738",
+                    "operationalBaseCode": "EPWA"
                 }
-                """.formatted(TYPE_B738_ID, BASE_EPWA_ID);
+                """;
 
         mockMvc.perform(post("/api/aircraft")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -68,19 +64,17 @@ class AircraftIntegrationTest {
         String body = """
                 {
                     "registrationNumber": "SP-DUP",
-                    "aircraftTypeId": "%s",
-                    "operationalBaseId": "%s"
+                    "aircraftTypeCode": "B738",
+                    "operationalBaseCode": "EPWA"
                 }
-                """.formatted(TYPE_B738_ID, BASE_EPWA_ID);
+                """;
 
-        // First request — should succeed
         mockMvc.perform(post("/api/aircraft")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated());
 
-        // Second request — should conflict
         mockMvc.perform(post("/api/aircraft")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,10 +89,10 @@ class AircraftIntegrationTest {
         String body = """
                 {
                     "registrationNumber": "SP-BAD",
-                    "aircraftTypeId": "00000000-0000-0000-0000-000000000099",
-                    "operationalBaseId": "%s"
+                    "aircraftTypeCode": "XXXX",
+                    "operationalBaseCode": "EPWA"
                 }
-                """.formatted(BASE_EPWA_ID);
+                """;
 
         mockMvc.perform(post("/api/aircraft")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -114,10 +108,10 @@ class AircraftIntegrationTest {
         String body = """
                 {
                     "registrationNumber": "SP-BAD2",
-                    "aircraftTypeId": "%s",
-                    "operationalBaseId": "00000000-0000-0000-0000-000000000099"
+                    "aircraftTypeCode": "B738",
+                    "operationalBaseCode": "XXXX"
                 }
-                """.formatted(TYPE_B738_ID);
+                """;
 
         mockMvc.perform(post("/api/aircraft")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -132,10 +126,10 @@ class AircraftIntegrationTest {
         String body = """
                 {
                     "registrationNumber": "SP-NO",
-                    "aircraftTypeId": "%s",
-                    "operationalBaseId": "%s"
+                    "aircraftTypeCode": "B738",
+                    "operationalBaseCode": "EPWA"
                 }
-                """.formatted(TYPE_B738_ID, BASE_EPWA_ID);
+                """;
 
         mockMvc.perform(post("/api/aircraft")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -149,10 +143,10 @@ class AircraftIntegrationTest {
         String body = """
                 {
                     "registrationNumber": "SP-NOPERM",
-                    "aircraftTypeId": "%s",
-                    "operationalBaseId": "%s"
+                    "aircraftTypeCode": "B738",
+                    "operationalBaseCode": "EPWA"
                 }
-                """.formatted(TYPE_B738_ID, BASE_EPWA_ID);
+                """;
 
         mockMvc.perform(post("/api/aircraft")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -165,14 +159,13 @@ class AircraftIntegrationTest {
     void getAircraft_shouldReturnFleetList() throws Exception {
         String token = getToken("admin", "test1234");
 
-        // Add an aircraft first
         String body = """
                 {
                     "registrationNumber": "SP-GET",
-                    "aircraftTypeId": "%s",
-                    "operationalBaseId": "%s"
+                    "aircraftTypeCode": "A320",
+                    "operationalBaseCode": "EPKK"
                 }
-                """.formatted(TYPE_B738_ID, BASE_EPWA_ID);
+                """;
 
         mockMvc.perform(post("/api/aircraft")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -180,7 +173,6 @@ class AircraftIntegrationTest {
                         .content(body))
                 .andExpect(status().isCreated());
 
-        // Get fleet list
         mockMvc.perform(get("/api/aircraft")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())

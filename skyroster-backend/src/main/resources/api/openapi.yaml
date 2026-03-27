@@ -266,21 +266,21 @@ components:
       type: object
       required:
         - registrationNumber
-        - aircraftTypeId
-        - operationalBaseId
+        - aircraftTypeCode
+        - operationalBaseCode
       properties:
         registrationNumber:
           type: string
           description: Aircraft registration number
           example: "SP-LRA"
-        aircraftTypeId:
+        aircraftTypeCode:
           type: string
-          format: uuid
-          description: ID of the aircraft type
-        operationalBaseId:
+          description: ICAO aircraft type code
+          example: "B738"
+        operationalBaseCode:
           type: string
-          format: uuid
-          description: ID of the operational base
+          description: ICAO operational base code
+          example: "EPWA"
 
     AircraftTypeInfo:
       type: object

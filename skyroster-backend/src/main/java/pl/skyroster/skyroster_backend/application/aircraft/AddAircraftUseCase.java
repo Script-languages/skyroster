@@ -31,7 +31,7 @@ public class AddAircraftUseCase {
     }
 
     @Transactional
-    public Aircraft execute(String registrationNumber, UUID aircraftTypeId, UUID operationalBaseId) {
+    public Aircraft execute(String registrationNumber, String aircraftTypeCode, String operationalBaseCode) {
         if (registrationNumber == null || registrationNumber.isBlank()) {
             throw new IllegalArgumentException("Registration number must not be blank");
         }
@@ -40,11 +40,11 @@ public class AddAircraftUseCase {
             throw new AircraftAlreadyExistsException(registrationNumber);
         }
 
-        AircraftType type = aircraftTypeRepository.findById(aircraftTypeId)
-                .orElseThrow(() -> new AircraftTypeNotFoundException(aircraftTypeId));
+        AircraftType type = aircraftTypeRepository.findByIcaoCode(aircraftTypeCode)
+                .orElseThrow(() -> new AircraftTypeNotFoundException(aircraftTypeCode));
 
-        OperationalBase base = operationalBaseRepository.findById(operationalBaseId)
-                .orElseThrow(() -> new OperationalBaseNotFoundException(operationalBaseId));
+        OperationalBase base = operationalBaseRepository.findByIcaoCode(operationalBaseCode)
+                .orElseThrow(() -> new OperationalBaseNotFoundException(operationalBaseCode));
 
         Aircraft aircraft = new Aircraft(UUID.randomUUID(), registrationNumber, LocalDateTime.now(), type, base);
         return aircraftRepository.save(aircraft);
