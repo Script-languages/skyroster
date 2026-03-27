@@ -38,11 +38,4 @@ public class Aircraft {
     @JoinColumn(name = "operational_base_id", nullable = false)
     private OperationalBase operationalBase;
 
-    public Aircraft(UUID id, String registrationNumber, AircraftType aircraftType, OperationalBase operationalBase) {
-        this.id = id;
-        this.registrationNumber = registrationNumber;
-        this.createdAt = LocalDateTime.now();
-        this.aircraftType = aircraftType;
-        this.operationalBase = operationalBase;
-    }
 }

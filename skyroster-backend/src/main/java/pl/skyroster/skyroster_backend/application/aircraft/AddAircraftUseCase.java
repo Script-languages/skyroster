@@ -12,6 +12,7 @@ import pl.skyroster.skyroster_backend.domain.port.AircraftRepository;
 import pl.skyroster.skyroster_backend.domain.port.AircraftTypeRepository;
 import pl.skyroster.skyroster_backend.domain.port.OperationalBaseRepository;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -45,7 +46,7 @@ public class AddAircraftUseCase {
         OperationalBase base = operationalBaseRepository.findById(operationalBaseId)
                 .orElseThrow(() -> new OperationalBaseNotFoundException(operationalBaseId));
 
-        Aircraft aircraft = new Aircraft(UUID.randomUUID(), registrationNumber, type, base);
+        Aircraft aircraft = new Aircraft(UUID.randomUUID(), registrationNumber, LocalDateTime.now(), type, base);
         return aircraftRepository.save(aircraft);
     }
 }
