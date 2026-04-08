@@ -26,7 +26,7 @@ jobs:
 
       - name: Backend - verify (compile + test + coverage)
         working-directory: skyroster-backend
-        run: ./mvnw verify
+        run: chmod +x mvnw && ./mvnw verify
 
       # --- Frontend ---
       - name: Set up Node.js 22
