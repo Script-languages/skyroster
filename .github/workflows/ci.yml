@@ -42,7 +42,7 @@ jobs:
 
       - name: Frontend - lint
         working-directory: skyroster-frontend
-        run: npm run lint
+        run: npx oxlint . && npx eslint .
 
       - name: Frontend - build
         working-directory: skyroster-frontend
