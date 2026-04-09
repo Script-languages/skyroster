@@ -82,7 +82,7 @@ services:
       - backend
       - full
     ports:
-      - "8000:8000"
+      - "8001:8001"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-skyroster}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-skyroster}

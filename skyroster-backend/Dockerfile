@@ -1,17 +1,24 @@
-FROM maven:3-eclipse-temurin-25-alpine AS builder
+# Stage 1: Build
+FROM eclipse-temurin:25-jdk AS build
+LABEL authors="Bartosz Janusz, Maksymilian Krywionek, Marcin Kuduk, Łukasz Lizak"
 
 WORKDIR /app
 
-COPY . .
+# Copy Maven wrapper and POM for dependency caching
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
 
-RUN ./mvnw clean package -DskipTests
+# Copy source and build (skip tests — they ran in CI job 1)
+COPY src/ src/
+RUN ./mvnw package -DskipTests -B
 
-FROM eclipse-temurin:25-jdk-alpine
-
+# Stage 2: Runtime
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8000
+EXPOSE 8001
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
