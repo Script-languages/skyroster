@@ -6,6 +6,7 @@ services:
       - skyroster-network
     profiles:
       - db
+      - frontend
       - backend
       - full
     environment:
@@ -29,6 +30,7 @@ services:
     networks:
       - skyroster-network
     profiles:
+      - frontend
       - backend
       - full
     environment:
