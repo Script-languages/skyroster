@@ -1,5 +1,7 @@
 # Stage 1: Build
 FROM eclipse-temurin:25-jdk AS build
+LABEL authors="Bartosz Janusz, Maksymilian Krywionek, Marcin Kuduk, Łukasz Lizak"
+
 WORKDIR /app
 
 # Copy Maven wrapper and POM for dependency caching
