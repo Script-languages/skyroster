@@ -13,9 +13,13 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@daypilot/daypilot-lite-vue": "^5.5.0",
+    "@primeuix/themes": "^2.0.3",
     "axios": "^1.13.6",
     "keycloak-js": "^26.2.3",
     "pinia": "^3.0.4",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.5.4",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3"
   },
