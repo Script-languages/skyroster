@@ -7,7 +7,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.skyroster.skyroster_backend.TestcontainersConfiguration;
 
@@ -20,7 +19,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,44 +40,6 @@ class SecurityIntegrationTest {
         mockMvc.perform(get("/api/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"));
-    }
-
-    @Test
-    void adminEndpoint_shouldReturn401_whenNoToken() throws Exception {
-        mockMvc.perform(get("/api/admin/users"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value(401))
-                .andExpect(jsonPath("$.error").value("Unauthorized"))
-                .andExpect(jsonPath("$.path").value("/api/admin/users"));
-    }
-
-    @Test
-    void adminEndpoint_shouldReturn401_whenInvalidToken() throws Exception {
-        mockMvc.perform(get("/api/admin/users")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer invalid-token"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value(401));
-    }
-
-    @Test
-    void adminEndpoint_shouldReturn403_whenSchedulePlannerToken() throws Exception {
-        String token = getToken("schedule_planner", "test1234");
-        mockMvc.perform(get("/api/admin/users")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
-                .andExpect(status().isForbidden())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.error").value("Forbidden"));
-    }
-
-    @Test
-    void adminEndpoint_shouldReturn200_whenAdminToken() throws Exception {
-        String token = getToken("admin", "test1234");
-        mockMvc.perform(get("/api/admin/users")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
-                .andExpect(status().isOk());
     }
 
     @Test

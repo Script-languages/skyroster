@@ -199,10 +199,43 @@
       ]
     },
     {
-      "name": "Admin",
+      "name": "Aircraft",
       "item": [
         {
-          "name": "GET /api/admin/users",
+          "name": "POST /api/aircraft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registrationNumber\": \"SP-LRA\",\n  \"aircraftTypeCode\": \"B738\",\n  \"operationalBaseCode\": \"EPWA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/aircraft",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "aircraft"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/aircraft",
           "request": {
             "method": "GET",
             "header": [
@@ -213,14 +246,13 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/admin/users",
+              "raw": "{{base_url}}/api/aircraft",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
-                "users"
+                "aircraft"
               ]
             }
           },
