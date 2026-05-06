@@ -90,6 +90,7 @@ function confirmDelete(aircraft) {
       :value="aircraftStore.aircraft"
       stripedRows
       paginator
+      removableSort
       :rows="10"
       :rowsPerPageOptions="[5, 10, 20]"
       tableStyle="min-width: 50rem"
