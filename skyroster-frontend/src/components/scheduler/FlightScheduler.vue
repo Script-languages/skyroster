@@ -1,14 +1,14 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
-import { DayPilot, DayPilotScheduler } from '@daypilot/daypilot-lite-vue'
-import { useFlightsStore } from '../../stores/flights'
-import { usePilotsStore } from '../../stores/pilots'
-import { useAircraftStore } from '../../stores/aircraft'
+import {computed, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {DayPilot, DayPilotScheduler} from '@daypilot/daypilot-lite-vue'
+import {useFlightsStore} from '@/stores/flights.js'
+import {usePilotsStore} from '@/stores/pilots.js'
+import {useAircraftStore} from '@/stores/aircraft.js'
 
 const emit = defineEmits(['eventClick', 'timeRangeSelected'])
 
 const flightsStore = useFlightsStore()
-const pilotsStore = usePilotsStore()
+usePilotsStore()
 const aircraftStore = useAircraftStore()
 
 const schedulerRef = ref(null)
@@ -19,10 +19,25 @@ const initialStartDate = DayPilot.Date.today().firstDayOfMonth()
 let resizeObserver = null
 let resizeRaf = null
 
+DayPilot.Locale.register(
+  new DayPilot.Locale('pl-pl', {
+    dayNames: ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
+    dayNamesShort: ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So'],
+    monthNames: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
+    monthNamesShort: ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'],
+    timePattern: 'HH:mm',
+    datePattern: 'yyyy-MM-dd',
+    dateTimePattern: 'yyyy-MM-dd HH:mm',
+    timeFormat: 'Clock24Hours',
+    weekStarts: 1
+  })
+)
+
 const schedulerConfig = ref({
+  locale: 'pl-pl',
   timeHeaders: [
-    { groupBy: 'Month' },
-    { groupBy: 'Day', format: 'd' }
+    {groupBy: 'Month'},
+    {groupBy: 'Day', format: 'd'}
   ],
   scale: 'Day',
   days: initialStartDate.daysInMonth(),
@@ -32,14 +47,14 @@ const schedulerConfig = ref({
   rowHeaderWidth: 150,
   treeEnabled: false,
   width: '100%',
-  
+
   onEventClick: (args) => {
     const flight = flightsStore.getFlightById(args.e.id())
     if (flight) {
       emit('eventClick', flight)
     }
   },
-  
+
   onTimeRangeSelected: (args) => {
     const aircraft = aircraftStore.getAircraftById(args.resource)
     emit('timeRangeSelected', {
@@ -51,18 +66,29 @@ const schedulerConfig = ref({
     schedulerRef.value?.control?.clearSelection()
   },
 
+  allowEventOverlap: true,
   onBeforeEventRender: (args) => {
     const flight = flightsStore.getFlightById(args.data.id)
     if (flight) {
-      const pilotName = pilotsStore.getPilotFullName(flight.pilotId)
-      args.data.areas = [
-        {
-          bottom: 2,
-          right: 4,
-          html: `<span style="font-size: 10px; color: rgba(255,255,255,0.8);">${pilotName}</span>`,
-          style: 'text-align: right;'
-        }
-      ]
+      const routeText = args.data.text || ''
+
+      let arrival = routeText
+      if (routeText.includes(' \u2192 ')) {
+        arrival = routeText.split(' \u2192 ').pop()
+      } else if (routeText.includes(' -> ')) {
+        arrival = routeText.split(' -> ').pop()
+      }
+
+      args.data.html = `
+        <div class="flight-event-wrapper">
+          <span class="flight-full-text">${routeText}</span>
+          <span class="flight-short-text">${arrival}</span>
+        </div>
+      `
+      args.data.toolTip = routeText // pełny tekst po najechaniu myszką
+
+      // Usuwamy rysowanie białego imienia i nazwiska
+      args.data.areas = []
     }
   }
 })
@@ -99,7 +125,7 @@ function updateTimelineForCurrentViewport() {
   const control = schedulerRef.value.control
   const days = getTimelineDays(control.startDate)
   if (control.days !== days) {
-    control.update({ days })
+    control.update({days})
   }
 }
 
@@ -134,7 +160,7 @@ function navigateNext() {
 
 watch([resources, events], () => {
   loadData()
-}, { deep: true })
+}, {deep: true})
 
 onMounted(() => {
   if (typeof ResizeObserver !== 'undefined') {
@@ -181,7 +207,7 @@ defineExpose({
 
 <template>
   <div ref="schedulerContainerRef" class="flight-scheduler">
-    <DayPilotScheduler ref="schedulerRef" :config="schedulerConfig" />
+    <DayPilotScheduler ref="schedulerRef" :config="schedulerConfig"/>
   </div>
 </template>
 
@@ -196,5 +222,40 @@ defineExpose({
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   overflow: hidden;
+}
+
+.flight-scheduler :deep(.flight-event-wrapper) {
+  container-type: inline-size;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.flight-scheduler :deep(.flight-full-text) {
+  display: block;
+  white-space: nowrap;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flight-scheduler :deep(.flight-short-text) {
+  display: none;
+  white-space: nowrap;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@container (max-width: 110px) {
+  .flight-scheduler :deep(.flight-full-text) {
+    display: none;
+  }
+
+  .flight-scheduler :deep(.flight-short-text) {
+    display: block;
+  }
 }
 </style>

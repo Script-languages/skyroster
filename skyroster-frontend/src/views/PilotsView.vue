@@ -75,6 +75,7 @@ function confirmDelete(pilot) {
       :value="pilotsStore.pilots"
       stripedRows
       paginator
+      removableSort
       :rows="10"
       :rowsPerPageOptions="[5, 10, 20]"
       tableStyle="min-width: 50rem"
