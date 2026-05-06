@@ -34,4 +34,36 @@ public class Flight {
     private OperationalBase endAirport;
 
     private String description;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Aircraft getAircraft() {
+        return aircraft;
+    }
+
+    public Pilot getPilot() {
+        return pilot;
+    }
+
+    public OffsetDateTime getFlightStart() {
+        return flightStart;
+    }
+
+    public OffsetDateTime getFlightEnd() {
+        return flightEnd;
+    }
+
+    public OperationalBase getStartAirport() {
+        return startAirport;
+    }
+
+    public OperationalBase getEndAirport() {
+        return endAirport;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }
