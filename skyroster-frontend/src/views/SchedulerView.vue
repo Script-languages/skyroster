@@ -11,6 +11,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
 import FlightScheduler from '../components/scheduler/FlightScheduler.vue'
+import { BASES } from '../data/mockData' // Add BASES import
 
 const flightsStore = useFlightsStore()
 const aircraftStore = useAircraftStore()
@@ -24,6 +25,11 @@ const selectedFlight = ref(null)
 
 const flightForm = ref(getEmptyForm())
 
+const baseOptions = BASES.map(b => ({
+  label: `${b.value} - ${b.label}`,
+  value: b.value
+}))
+
 const pilotOptions = pilotsStore.pilots.map(p => ({
   label: `${p.imie} ${p.nazwisko}`,
   value: p.id
@@ -35,14 +41,16 @@ const aircraftOptions = aircraftStore.aircraft.map(a => ({
 }))
 
 function getEmptyForm() {
+  const today = new Date()
   return {
     aircraftId: null,
     pilotId: null,
-    startDate: null,
-    startTime: null,
-    endDate: null,
-    endTime: null,
-    text: '',
+    startDate: today,
+    startTime: new Date(1970, 0, 1, 8, 0),
+    endDate: today,
+    endTime: new Date(1970, 0, 1, 10, 0),
+    departure: null,
+    arrival: null,
     description: ''
   }
 }
@@ -67,10 +75,27 @@ function parseDateTimeFromStore(dateTimeStr) {
 function handleEventClick(flight) {
   selectedFlight.value = flight
   isEditMode.value = true
-  
+
   const startParsed = parseDateTimeFromStore(flight.start)
   const endParsed = parseDateTimeFromStore(flight.end)
-  
+
+  // Extract departure and arrival from text if possible
+  let dep = null
+  let arr = null
+  if (flight.text) {
+    const parts = flight.text.split(' \u2192 ')
+    if (parts.length === 2) {
+      dep = parts[0]
+      arr = parts[1]
+    } else {
+      const partsArrow = flight.text.split(' -> ')
+      if (partsArrow.length === 2) {
+        dep = partsArrow[0]
+        arr = partsArrow[1]
+      }
+    }
+  }
+
   flightForm.value = {
     aircraftId: flight.aircraftId,
     pilotId: flight.pilotId,
@@ -78,29 +103,33 @@ function handleEventClick(flight) {
     startTime: startParsed.time,
     endDate: endParsed.date,
     endTime: endParsed.time,
-    text: flight.text,
+    departure: dep,
+    arrival: arr,
     description: flight.description || ''
   }
-  
+
   dialogVisible.value = true
 }
 
 function handleTimeRangeSelected(selection) {
   selectedFlight.value = null
   isEditMode.value = false
-  
-  const startDate = new Date(selection.start.toString())
-  const endDate = new Date(selection.end.toString())
-  
+
+  const startValue = selection.start.value ? selection.start.value : selection.start.toString()
+  const endValue = selection.end.value ? selection.end.value : selection.end.toString()
+
+  const startDate = new Date(startValue)
+  new Date(endValue)
+
   flightForm.value = {
     ...getEmptyForm(),
     aircraftId: selection.aircraftId,
     startDate: startDate,
     startTime: new Date(1970, 0, 1, 8, 0),
-    endDate: endDate,
+    endDate: startDate,
     endTime: new Date(1970, 0, 1, 10, 0)
   }
-  
+
   dialogVisible.value = true
 }
 
@@ -112,15 +141,20 @@ function openAddDialog() {
 }
 
 function saveFlight() {
+  if (!flightForm.value.startDate || !flightForm.value.startTime || !flightForm.value.endDate || !flightForm.value.endTime) {
+    toast.add({ severity: 'error', summary: 'Błąd', detail: 'Podaj poprawne daty i godziny lotu', life: 3000 })
+    return
+  }
+
   const flightData = {
     aircraftId: flightForm.value.aircraftId,
     pilotId: flightForm.value.pilotId,
     start: formatDateTimeForStore(flightForm.value.startDate, flightForm.value.startTime),
     end: formatDateTimeForStore(flightForm.value.endDate, flightForm.value.endTime),
-    text: flightForm.value.text,
+    text: `${flightForm.value.departure} \u2192 ${flightForm.value.arrival}`,
     description: flightForm.value.description
   }
-  
+
   if (isEditMode.value && selectedFlight.value) {
     flightsStore.updateFlight(selectedFlight.value.id, flightData)
     toast.add({ severity: 'success', summary: 'Sukces', detail: 'Lot został zaktualizowany', life: 3000 })
@@ -128,7 +162,7 @@ function saveFlight() {
     flightsStore.addFlight(flightData)
     toast.add({ severity: 'success', summary: 'Sukces', detail: 'Lot został dodany', life: 3000 })
   }
-  
+
   dialogVisible.value = false
 }
 
@@ -180,7 +214,8 @@ function navigateNext() {
     <Dialog
       v-model:visible="dialogVisible"
       :header="isEditMode ? 'Edytuj lot' : 'Dodaj lot'"
-      :style="{ width: '500px' }"
+      :style="{ width: '600px' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
       modal
     >
       <div class="form-grid">
@@ -252,9 +287,30 @@ function navigateNext() {
           />
         </div>
 
-        <div class="form-field full-width">
-          <label for="text">Trasa</label>
-          <InputText id="text" v-model="flightForm.text" placeholder="np. EPWA → EPKK" class="w-full" />
+        <div class="form-field">
+          <label for="departure">Lotnisko startowe</label>
+          <Select
+            id="departure"
+            v-model="flightForm.departure"
+            :options="baseOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Wybierz startowe"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="arrival">Lotnisko docelowe</label>
+          <Select
+            id="arrival"
+            v-model="flightForm.arrival"
+            :options="baseOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Wybierz docelowe"
+            class="w-full"
+          />
         </div>
 
         <div class="form-field full-width">
