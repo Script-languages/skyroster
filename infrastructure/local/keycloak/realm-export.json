@@ -32,7 +32,7 @@
       "lastName": "User",
       "enabled": true,
       "credentials": [{ "type": "password", "value": "test1234", "temporary": false }],
-      "realmRoles": ["operations_administrator"]
+      "realmRoles": ["operations_administrator", "schedule_planner"]
     },
     {
       "username": "compliance",
