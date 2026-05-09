@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useFlightsStore } from '../stores/flights'
 import { useAircraftStore } from '../stores/aircraft'
 import { usePilotsStore } from '../stores/pilots'
@@ -24,6 +24,10 @@ const isEditMode = ref(false)
 const selectedFlight = ref(null)
 
 const flightForm = ref(getEmptyForm())
+
+onMounted(() => {
+  flightsStore.loadPlanningSchedules()
+})
 
 const baseOptions = BASES.map(b => ({
   label: `${b.value} - ${b.label}`,
