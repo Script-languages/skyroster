@@ -68,28 +68,25 @@ const schedulerConfig = ref({
 
   allowEventOverlap: true,
   onBeforeEventRender: (args) => {
-    const flight = flightsStore.getFlightById(args.data.id)
-    if (flight) {
-      const routeText = args.data.text || ''
+    const routeText = args.data.text || ''
 
-      let arrival = routeText
-      if (routeText.includes(' \u2192 ')) {
-        arrival = routeText.split(' \u2192 ').pop()
-      } else if (routeText.includes(' -> ')) {
-        arrival = routeText.split(' -> ').pop()
-      }
-
-      args.data.html = `
-        <div class="flight-event-wrapper">
-          <span class="flight-full-text">${routeText}</span>
-          <span class="flight-short-text">${arrival}</span>
-        </div>
-      `
-      args.data.toolTip = routeText // pełny tekst po najechaniu myszką
-
-      // Usuwamy rysowanie białego imienia i nazwiska
-      args.data.areas = []
+    let arrival = routeText
+    if (routeText.includes(' \u2192 ')) {
+      arrival = routeText.split(' \u2192 ').pop()
+    } else if (routeText.includes(' -> ')) {
+      arrival = routeText.split(' -> ').pop()
     }
+
+    args.data.html = `
+      <div class="flight-event-wrapper">
+        <span class="flight-full-text">${routeText}</span>
+        <span class="flight-short-text">${arrival}</span>
+      </div>
+    `
+    args.data.toolTip = routeText // pełny tekst po najechaniu myszką
+
+    // Usuwamy rysowanie białego imienia i nazwiska
+    args.data.areas = []
   }
 })
 

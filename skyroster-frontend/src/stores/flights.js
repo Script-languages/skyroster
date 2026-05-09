@@ -50,19 +50,25 @@ export const useFlightsStore = defineStore('flights', () => {
     return flights.value.find(f => f.id === id)
   }
 
-  function parseScheduleDate(value) {
+  function parseScheduleDateTime(value) {
     if (!value || typeof value !== 'string') return null
-    const datePart = value.includes('T') ? value.split('T')[0] : value
-    const [year, month, day] = datePart.split('-').map(Number)
-    if (!year || !month || !day) return null
-    return new Date(year, month - 1, day)
+    const date = new Date(value)
+    return Number.isNaN(date.getTime()) ? null : date
   }
 
-  function formatDatePart(date) {
+  function formatDateTimeForEvent(date) {
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    return `${year}-${month}-${day}T${hours}:${minutes}:00`
+  }
+
+  function formatTimeLabel(date) {
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    return `${hours}:${minutes}`
   }
 
   function getPlanningScheduleEvents(aircraftStore, pilotsStore) {
@@ -71,22 +77,28 @@ export const useFlightsStore = defineStore('flights', () => {
 
     return planningSchedules.value
       .map((schedule, index) => {
-        const startDate = parseScheduleDate(schedule.date)
-        if (!startDate) return null
+        const startDateTime = parseScheduleDateTime(schedule.startDateTime ?? schedule.date)
+        if (!startDateTime) return null
 
-        const endDate = new Date(startDate)
-        endDate.setDate(endDate.getDate() + 1)
+        let endDateTime = parseScheduleDateTime(schedule.endDateTime)
+        if (!endDateTime) {
+          endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000)
+        }
+        if (endDateTime <= startDateTime) {
+          endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000)
+        }
 
         const pilot = pilotsStore.pilots.find(p => `${p.imie} ${p.nazwisko}` === schedule.pilotName)
         const eventId = schedule.id ? `API-${schedule.id}` : `API-${index + 1}`
+        const timeLabel = `${formatTimeLabel(startDateTime)} \u2192 ${formatTimeLabel(endDateTime)}`
 
         return {
           id: eventId,
           resource: aircraftIds[index % aircraftIds.length],
-          start: `${formatDatePart(startDate)}T00:00:00`,
-          end: `${formatDatePart(endDate)}T00:00:00`,
-          text: `${schedule.pilotName} (API)`,
-          barColor: '#0EA5E9',
+          start: formatDateTimeForEvent(startDateTime),
+          end: formatDateTimeForEvent(endDateTime),
+          text: timeLabel,
+          barColor: '#3B82F6',
           pilotName: schedule.pilotName,
           pilotId: pilot?.id ?? null,
           isApiSchedule: true

@@ -62,7 +62,8 @@ class SecurityIntegrationTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id").exists())
                 .andExpect(jsonPath("$[0].pilotName").exists())
-                .andExpect(jsonPath("$[0].date").exists());
+                .andExpect(jsonPath("$[0].startDateTime").exists())
+                .andExpect(jsonPath("$[0].endDateTime").exists());
     }
 
     @Test
