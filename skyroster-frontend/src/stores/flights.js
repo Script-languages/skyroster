@@ -47,7 +47,26 @@ export const useFlightsStore = defineStore('flights', () => {
   }
 
   function getFlightById(id) {
-    return flights.value.find(f => f.id === id)
+    const localFlight = flights.value.find(f => f.id === id)
+    if (localFlight) return localFlight
+
+    if (id.startsWith('API-')) {
+      const apiId = id.replace('API-', '')
+      const schedule = planningSchedules.value.find((s, index) =>
+        String(s.id) === apiId || String(index + 1) === apiId
+      )
+
+      if (schedule) {
+        const start = parseScheduleDateTime(schedule.startDateTime ?? schedule.date)
+        return {
+          id: id,
+          pilotName: schedule.pilotName,
+          start: start ? formatDateTimeForEvent(start) : null,
+          isApi: true
+        }
+      }
+    }
+    return null
   }
 
   function parseScheduleDateTime(value) {
@@ -84,24 +103,23 @@ export const useFlightsStore = defineStore('flights', () => {
         if (!endDateTime) {
           endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000)
         }
-        if (endDateTime <= startDateTime) {
-          endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000)
-        }
 
         const pilot = pilotsStore.pilots.find(p => `${p.imie} ${p.nazwisko}` === schedule.pilotName)
         const eventId = schedule.id ? `API-${schedule.id}` : `API-${index + 1}`
-        const timeLabel = `${formatTimeLabel(startDateTime)} \u2192 ${formatTimeLabel(endDateTime)}`
+        const routeInfo = schedule.route || `${schedule.pilotName || 'Planowany lot'}`
+        const displayText = `${routeInfo} \u2192 ${formatTimeLabel(endDateTime)}`
 
         return {
           id: eventId,
           resource: aircraftIds[index % aircraftIds.length],
           start: formatDateTimeForEvent(startDateTime),
           end: formatDateTimeForEvent(endDateTime),
-          text: timeLabel,
+          text: displayText,
           barColor: '#3B82F6',
           pilotName: schedule.pilotName,
           pilotId: pilot?.id ?? null,
-          isApiSchedule: true
+          isApiSchedule: true,
+          aircraftDisplay: aircraftStore.getAircraftDisplay(aircraftIds[index % aircraftIds.length])
         }
       })
       .filter(Boolean)
@@ -132,23 +150,32 @@ export const useFlightsStore = defineStore('flights', () => {
     const aircraftStore = useAircraftStore()
     const pilotsStore = usePilotsStore()
 
-    const localEvents = flights.value.map(flight => ({
-      id: flight.id,
-      resource: flight.aircraftId,
-      start: flight.start,
-      end: flight.end,
-      text: flight.text,
-      barColor: '#3B82F6',
-      pilotName: pilotsStore.getPilotFullName(flight.pilotId),
-      aircraftDisplay: aircraftStore.getAircraftDisplay(flight.aircraftId)
-    }))
+    const localEvents = flights.value.map(flight => {
+      const endDate = new Date(flight.end)
+      const formattedEndTime = !Number.isNaN(endDate.getTime())
+        ? formatTimeLabel(endDate)
+        : ''
+
+      const displayText = `${flight.text} \u2192 ${formattedEndTime}`
+
+      return {
+        id: flight.id,
+        resource: flight.aircraftId,
+        start: flight.start,
+        end: flight.end,
+        text: displayText,
+        barColor: '#3B82F6',
+        pilotName: pilotsStore.getPilotFullName(flight.pilotId),
+        aircraftDisplay: aircraftStore.getAircraftDisplay(flight.aircraftId)
+      }
+    })
 
     return [...localEvents, ...getPlanningScheduleEvents(aircraftStore, pilotsStore)]
   }
 
   function getSchedulerResources() {
     const aircraftStore = useAircraftStore()
-    
+
     return aircraftStore.aircraft.map(aircraft => ({
       id: aircraft.id,
       name: `${aircraft.rejestracja} (${aircraft.typ})`
