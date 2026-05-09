@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.skyroster.skyroster_backend.domain.exception.AircraftAlreadyExistsException;
+import pl.skyroster.skyroster_backend.domain.exception.AircraftNotFoundException;
 import pl.skyroster.skyroster_backend.domain.exception.AircraftTypeNotFoundException;
 import pl.skyroster.skyroster_backend.domain.exception.OperationalBaseNotFoundException;
 import pl.skyroster.skyroster_backend.generated.model.ErrorResponse;
@@ -19,6 +20,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAircraftAlreadyExists(AircraftAlreadyExistsException ex,
                                                                       HttpServletRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(AircraftNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAircraftNotFound(AircraftNotFoundException ex,
+                                                                 HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     @ExceptionHandler(AircraftTypeNotFoundException.class)
