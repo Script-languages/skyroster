@@ -10,7 +10,7 @@ import pl.skyroster.skyroster_backend.domain.port.RuleRepository;
 import java.util.UUID;
 
 @Repository
-public interface JpaRuleRepository extends JpaRepository<Rule, UUID>, RuleRepository {
+public interface JpaRuleRepository extends JpaRepository<Rule, UUID> {
     Page<Rule> findByRuleTypeAndActive(String ruleType, boolean active, Pageable pageable);
     Page<Rule> findByRuleType(String ruleType, Pageable pageable);
     Page<Rule> findByActive(boolean active, Pageable pageable);
