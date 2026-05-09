@@ -20,6 +20,7 @@ import java.net.http.HttpResponse;
 
 import java.util.UUID;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -326,6 +327,44 @@ class AircraftIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deleteAircraft_shouldReturn204_whenAircraftHasNoFlights() throws Exception {
+        String token = getToken("admin", "test1234");
+        UUID aircraftId = createAircraft(token, "SP-DEL1", "B738", "EPWA");
+
+        mockMvc.perform(delete("/api/aircraft/" + aircraftId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/aircraft")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == '" + aircraftId + "')]").isEmpty());
+    }
+
+    @Test
+    void deleteAircraft_shouldReturn404_whenAircraftDoesNotExist() throws Exception {
+        String token = getToken("admin", "test1234");
+
+        mockMvc.perform(delete("/api/aircraft/" + UUID.randomUUID())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Aircraft not found"));
+    }
+
+    @Test
+    void deleteAircraft_shouldReturn409_whenAircraftHasAssignedFlights() throws Exception {
+        String token = getToken("admin", "test1234");
+        // Use the seeded aircraft SP-KWA which has assigned flights from V2__aircraft_schema_and_seed.sql
+        UUID seededAircraftId = UUID.fromString("e0000000-0000-0000-0000-000000000001");
+
+        mockMvc.perform(delete("/api/aircraft/" + seededAircraftId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value(
+                        org.hamcrest.Matchers.containsString("SP-KWA")));
     }
 
     private UUID createAircraft(String token, String registration, String typeCode, String baseCode) throws Exception {
