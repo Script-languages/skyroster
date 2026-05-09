@@ -1,11 +1,13 @@
 package pl.skyroster.skyroster_backend.domain.model;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.persistence.*;
-
 @Entity
+@Getter
 public class Pilot {
 
     @Id

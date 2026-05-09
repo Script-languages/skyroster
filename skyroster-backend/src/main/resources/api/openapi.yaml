@@ -5,15 +5,15 @@ info:
   version: 0.1.0
 
 security:
-  - bearerAuth: []
+  - bearerAuth: [ ]
 
 paths:
   /api/health:
     get:
       operationId: getHealth
-      tags: [Health]
+      tags: [ Health ]
       summary: Health check
-      security: []
+      security: [ ]
       responses:
         '200':
           description: Service is healthy
@@ -25,7 +25,7 @@ paths:
   /api/me:
     get:
       operationId: getCurrentUser
-      tags: [User]
+      tags: [ User ]
       summary: Get current authenticated user info
       responses:
         '200':
@@ -44,7 +44,7 @@ paths:
   /api/compliance/reports:
     get:
       operationId: getComplianceReports
-      tags: [Compliance]
+      tags: [ Compliance ]
       summary: List compliance reports
       responses:
         '200':
@@ -71,7 +71,7 @@ paths:
   /api/planning/schedules:
     get:
       operationId: getPlanningSchedules
-      tags: [Planning]
+      tags: [ Planning ]
       summary: List schedules
       responses:
         '200':
@@ -98,7 +98,7 @@ paths:
   /api/aircraft:
     post:
       operationId: addAircraft
-      tags: [Aircraft]
+      tags: [ Aircraft ]
       summary: Add a new aircraft to the fleet
       requestBody:
         required: true
@@ -139,7 +139,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     get:
       operationId: getAircraft
-      tags: [Aircraft]
+      tags: [ Aircraft ]
       summary: List all aircraft in the fleet
       responses:
         '200':
@@ -152,6 +152,53 @@ paths:
                   $ref: '#/components/schemas/AircraftResponse'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/pilots:
+    get:
+      tags:
+        - Pilots
+      operationId: getPilots
+      summary: Get paginated list of pilots
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            example: surname,asc
+      responses:
+        '200':
+          description: Paginated list of pilots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPilotResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -187,7 +234,7 @@ paths:
   /api/aircraft/{id}:
     put:
       operationId: updateAircraft
-      tags: [Aircraft]
+      tags: [ Aircraft ]
       summary: Update an aircraft in the fleet
       parameters:
         - in: path
@@ -241,7 +288,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: deleteAircraft
-      tags: [Aircraft]
+      tags: [ Aircraft ]
       summary: Delete an aircraft from the fleet
       parameters:
         - in: path
@@ -336,7 +383,7 @@ components:
           description: List of realm roles assigned to the user
           items:
             type: string
-          example: ["operations_administrator"]
+          example: [ "operations_administrator" ]
 
     HealthStatus:
       type: object
@@ -387,6 +434,91 @@ components:
           type: string
           format: date-time
           example: "2026-03-20T11:00:00Z"
+
+    PagedPilotResponse:
+      type: object
+      required:
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PilotResponse'
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 20
+        totalElements:
+          type: integer
+          format: int64
+          example: 42
+        totalPages:
+          type: integer
+          example: 3
+        first:
+          type: boolean
+          example: true
+        last:
+          type: boolean
+          example: false
+
+    PilotResponse:
+      type: object
+      required:
+        - id
+        - firstName
+        - surname
+        - homeBase
+        - qualifications
+      properties:
+        id:
+          type: string
+          format: uuid
+        licence:
+          type: string
+          example: PIL-001
+        firstName:
+          type: string
+          example: Jan
+        surname:
+          type: string
+          example: Kowalski
+        homeBase:
+          $ref: '#/components/schemas/OperationalBaseInfo'
+        qualifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/PilotQualificationInfo'
+        aircraftTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AircraftTypeInfo'
+
+
+    PilotQualificationInfo:
+      type: object
+      required:
+        - id
+        - aircraftType
+        - licenseValidUntil
+      properties:
+        id:
+          type: string
+          format: uuid
+        values:
+          type: string
+        label:
+          type: string
+
+
 
     AddAircraftRequest:
       type: object
