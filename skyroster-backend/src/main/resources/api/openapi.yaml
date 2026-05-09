@@ -157,6 +157,44 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/rules:
+    get:
+      summary: Get rules
+      tags:
+        - Rules
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: paged list of rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedRuleDto'
+      security:
+        - bearerAuth: []
+
 components:
   securitySchemes:
     bearerAuth:
@@ -334,3 +372,46 @@ components:
           $ref: '#/components/schemas/AircraftTypeInfo'
         operationalBase:
           $ref: '#/components/schemas/OperationalBaseInfo'
+
+    RuleDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        ruleType:
+          type: string
+        maxMonthlyHours:
+          type: integer
+        minRestMinutes:
+          type: integer
+        minFlights:
+          type: integer
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PagedRuleDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleDto'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
