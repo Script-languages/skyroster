@@ -32,9 +32,7 @@ public class AddAircraftUseCase {
 
     @Transactional
     public Aircraft execute(String registrationNumber, String aircraftTypeCode, String operationalBaseCode) {
-        if (registrationNumber == null || registrationNumber.isBlank()) {
-            throw new IllegalArgumentException("Registration number must not be blank");
-        }
+        Aircraft.validateRegistrationNumber(registrationNumber);
 
         if (aircraftRepository.existsByRegistrationNumber(registrationNumber)) {
             throw new AircraftAlreadyExistsException(registrationNumber);
