@@ -25,8 +25,11 @@ public class TestcontainersConfiguration {
 
 	@Bean
 	DynamicPropertyRegistrar keycloakProperties(KeycloakContainer keycloak) {
-		return registry -> registry.add(
-				"spring.security.oauth2.resourceserver.jwt.issuer-uri",
+		return registry -> {
+			registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
 				() -> keycloak.getAuthServerUrl() + "/realms/skyroster");
+			registry.add("spring.security.oauth2.resourceserver.jwt.jwk-set-uri",
+				() -> keycloak.getAuthServerUrl() + "/realms/skyroster/protocol/openid-connect/certs");
+		};
 	}
 }
