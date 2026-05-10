@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/compliance/**").hasRole("compliance_officer")
                         .requestMatchers("/api/planning/**").hasRole("schedule_planner")
+                        .requestMatchers("/api/v1/rules/**").hasRole("compliance_officer")
                         .requestMatchers(HttpMethod.POST, "/api/aircraft/**").hasRole("operations_administrator")
                         .requestMatchers(HttpMethod.GET, "/api/aircraft/**").authenticated()
                         .requestMatchers("/api/**").authenticated()

@@ -11,5 +11,7 @@ CREATE TABLE IF NOT EXISTS rules (
   updated_at TIMESTAMP WITH TIME ZONE
 );
 
+
+
 CREATE INDEX IF NOT EXISTS idx_rules_rule_type ON rules(rule_type);
 CREATE INDEX IF NOT EXISTS idx_rules_active ON rules(active);
