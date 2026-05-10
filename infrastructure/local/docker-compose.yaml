@@ -45,6 +45,9 @@ services:
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
       - ./keycloak/themes/skyroster:/opt/keycloak/themes/skyroster
+    # NOTE: --import-realm uses IGNORE_EXISTING strategy. Changes to realm-export.json
+    # are NOT re-applied on existing realms. To pick up changes locally, run:
+    #   docker compose down -v && docker compose --profile <profile> up -d
     command: >
       start-dev
       --import-realm
