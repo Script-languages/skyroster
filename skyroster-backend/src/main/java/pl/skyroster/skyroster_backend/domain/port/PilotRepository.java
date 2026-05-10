@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import pl.skyroster.skyroster_backend.domain.model.Pilot;
 
+import java.util.UUID;
+
 public interface PilotRepository {
   @EntityGraph(attributePaths = {
       "qualifications",
@@ -14,4 +16,6 @@ public interface PilotRepository {
   })
   @Query("SELECT p FROM Pilot p")
   Page<Pilot> findAllWithRelations(Pageable pageable);
+  boolean existsById(UUID id);
+  void deleteById(UUID id);
 }

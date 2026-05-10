@@ -325,6 +325,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/pilots/{pilotId}:
+    delete:
+      tags:
+        - AdminPilots
+      operationId: deletePilotById
+      summary: Delete pilot by id
+      parameters:
+        - name: pilotId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Pilot deleted successfully
+        '404':
+          description: Pilot not found
+
 components:
   securitySchemes:
     bearerAuth:

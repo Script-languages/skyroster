@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/planning/**").hasRole("schedule_planner")
                         .requestMatchers(HttpMethod.POST, "/api/aircraft/**").hasRole("operations_administrator")
                         .requestMatchers(HttpMethod.GET, "/api/aircraft/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/pilots/**").hasRole("operations_administrator")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll()
                 )
