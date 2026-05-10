@@ -2,15 +2,9 @@ package pl.skyroster.skyroster_backend.application.flight;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.skyroster.skyroster_backend.domain.model.Aircraft;
-import pl.skyroster.skyroster_backend.domain.model.Flight;
-import pl.skyroster.skyroster_backend.domain.port.AircraftRepository;
 import pl.skyroster.skyroster_backend.domain.port.FlightRepository;
-import pl.skyroster.skyroster_backend.generated.model.AircraftResponse;
-import pl.skyroster.skyroster_backend.generated.model.AircraftTypeInfo;
 import pl.skyroster.skyroster_backend.generated.model.FlightResponse;
 import pl.skyroster.skyroster_backend.infrastructure.mappers.AircraftResponseMapper;
-import pl.skyroster.skyroster_backend.infrastructure.mappers.AircraftTypeInfoMapper;
 import pl.skyroster.skyroster_backend.infrastructure.mappers.OperationalBaseInfoMapper;
 
 import java.util.List;
