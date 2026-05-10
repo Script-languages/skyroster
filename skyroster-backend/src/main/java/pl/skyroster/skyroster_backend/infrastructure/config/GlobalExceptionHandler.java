@@ -1,11 +1,14 @@
 package pl.skyroster.skyroster_backend.infrastructure.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.skyroster.skyroster_backend.domain.exception.AircraftAlreadyExistsException;
+import pl.skyroster.skyroster_backend.domain.exception.AircraftHasAssignedFlightsException;
+import pl.skyroster.skyroster_backend.domain.exception.AircraftNotFoundException;
 import pl.skyroster.skyroster_backend.domain.exception.AircraftTypeNotFoundException;
 import pl.skyroster.skyroster_backend.domain.exception.OperationalBaseNotFoundException;
 import pl.skyroster.skyroster_backend.generated.model.ErrorResponse;
@@ -19,6 +22,26 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAircraftAlreadyExists(AircraftAlreadyExistsException ex,
                                                                       HttpServletRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(AircraftNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAircraftNotFound(AircraftNotFoundException ex,
+                                                                 HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(AircraftHasAssignedFlightsException.class)
+    public ResponseEntity<ErrorResponse> handleAircraftHasAssignedFlights(AircraftHasAssignedFlightsException ex,
+                                                                           HttpServletRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex,
+                                                                        HttpServletRequest request) {
+        return buildResponse(HttpStatus.CONFLICT,
+                "Aircraft cannot be deleted because it has assigned flights",
+                request);
     }
 
     @ExceptionHandler(AircraftTypeNotFoundException.class)
