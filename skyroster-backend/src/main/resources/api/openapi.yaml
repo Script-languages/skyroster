@@ -157,6 +157,100 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/aircraft/{id}:
+    put:
+      operationId: updateAircraft
+      tags: [Aircraft]
+      summary: Update an aircraft in the fleet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAircraftRequest'
+      responses:
+        '200':
+          description: Aircraft updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AircraftResponse'
+        '400':
+          description: Bad request (invalid type or base, or blank registration)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Aircraft not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Registration number is used by another aircraft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteAircraft
+      tags: [Aircraft]
+      summary: Delete an aircraft from the fleet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Aircraft deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Aircraft not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Aircraft has assigned flights
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/rules:
     get:
       summary: Get rules
@@ -287,7 +381,8 @@ components:
       required:
         - id
         - pilotName
-        - date
+        - startDateTime
+        - endDateTime
       properties:
         id:
           type: string
@@ -295,12 +390,36 @@ components:
         pilotName:
           type: string
           example: "Jan Kowalski"
-        date:
+        startDateTime:
           type: string
-          format: date
-          example: "2026-03-20"
+          format: date-time
+          example: "2026-03-20T08:00:00Z"
+        endDateTime:
+          type: string
+          format: date-time
+          example: "2026-03-20T11:00:00Z"
 
     AddAircraftRequest:
+      type: object
+      required:
+        - registrationNumber
+        - aircraftTypeCode
+        - operationalBaseCode
+      properties:
+        registrationNumber:
+          type: string
+          description: Aircraft registration number
+          example: "SP-LRA"
+        aircraftTypeCode:
+          type: string
+          description: ICAO aircraft type code
+          example: "B738"
+        operationalBaseCode:
+          type: string
+          description: ICAO operational base code
+          example: "EPWA"
+
+    UpdateAircraftRequest:
       type: object
       required:
         - registrationNumber
@@ -372,6 +491,7 @@ components:
           $ref: '#/components/schemas/AircraftTypeInfo'
         operationalBase:
           $ref: '#/components/schemas/OperationalBaseInfo'
+
 
     RuleDto:
       type: object
