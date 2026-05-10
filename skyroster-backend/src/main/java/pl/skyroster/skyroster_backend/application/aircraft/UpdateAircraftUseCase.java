@@ -3,6 +3,7 @@ package pl.skyroster.skyroster_backend.application.aircraft;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.skyroster.skyroster_backend.domain.exception.AircraftAlreadyExistsException;
+import pl.skyroster.skyroster_backend.domain.exception.AircraftNotFoundException;
 import pl.skyroster.skyroster_backend.domain.exception.AircraftTypeNotFoundException;
 import pl.skyroster.skyroster_backend.domain.exception.OperationalBaseNotFoundException;
 import pl.skyroster.skyroster_backend.domain.model.Aircraft;
@@ -12,29 +13,31 @@ import pl.skyroster.skyroster_backend.domain.port.AircraftRepository;
 import pl.skyroster.skyroster_backend.domain.port.AircraftTypeRepository;
 import pl.skyroster.skyroster_backend.domain.port.OperationalBaseRepository;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
-public class AddAircraftUseCase {
+public class UpdateAircraftUseCase {
 
     private final AircraftRepository aircraftRepository;
     private final AircraftTypeRepository aircraftTypeRepository;
     private final OperationalBaseRepository operationalBaseRepository;
 
-    public AddAircraftUseCase(AircraftRepository aircraftRepository,
-                              AircraftTypeRepository aircraftTypeRepository,
-                              OperationalBaseRepository operationalBaseRepository) {
+    public UpdateAircraftUseCase(AircraftRepository aircraftRepository,
+                                 AircraftTypeRepository aircraftTypeRepository,
+                                 OperationalBaseRepository operationalBaseRepository) {
         this.aircraftRepository = aircraftRepository;
         this.aircraftTypeRepository = aircraftTypeRepository;
         this.operationalBaseRepository = operationalBaseRepository;
     }
 
     @Transactional
-    public Aircraft execute(String registrationNumber, String aircraftTypeCode, String operationalBaseCode) {
+    public Aircraft execute(UUID id, String registrationNumber, String aircraftTypeCode, String operationalBaseCode) {
         Aircraft.validateRegistrationNumber(registrationNumber);
 
-        if (aircraftRepository.existsByRegistrationNumber(registrationNumber)) {
+        Aircraft existing = aircraftRepository.findById(id)
+                .orElseThrow(AircraftNotFoundException::new);
+
+        if (aircraftRepository.existsByRegistrationNumberAndIdNot(registrationNumber, id)) {
             throw new AircraftAlreadyExistsException(registrationNumber);
         }
 
@@ -44,7 +47,7 @@ public class AddAircraftUseCase {
         OperationalBase base = operationalBaseRepository.findByIcaoCode(operationalBaseCode)
                 .orElseThrow(() -> new OperationalBaseNotFoundException(operationalBaseCode));
 
-        Aircraft aircraft = new Aircraft(UUID.randomUUID(), registrationNumber, LocalDateTime.now(), type, base);
-        return aircraftRepository.save(aircraft);
+        Aircraft updated = new Aircraft(existing.getId(), registrationNumber, existing.getCreatedAt(), type, base);
+        return aircraftRepository.save(updated);
     }
 }

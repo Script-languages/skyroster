@@ -1,25 +1,24 @@
-package pl.skyroster.skyroster_backend.domain.controller;
+package pl.skyroster.skyroster_backend.infrastructure.adapter.in.web;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.skyroster.skyroster_backend.application.flight.GetFlightsUseCase;
 import pl.skyroster.skyroster_backend.domain.model.Flight;
-import pl.skyroster.skyroster_backend.domain.service.FlightService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/flights")
 public class FlightController {
+    private final GetFlightsUseCase getFlightsUseCase;
 
-    private final FlightService flightService;
-
-    public FlightController(FlightService flightService) {
-        this.flightService = flightService;
+    public FlightController(GetFlightsUseCase getFlightsUseCase) {
+        this.getFlightsUseCase = getFlightsUseCase;
     }
 
     @GetMapping
     public List<Flight> getFlights() {
-        return flightService.getAllFlights();
+        return getFlightsUseCase.execute();
     }
 }

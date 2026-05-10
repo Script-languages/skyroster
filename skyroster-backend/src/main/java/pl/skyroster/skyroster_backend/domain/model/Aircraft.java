@@ -38,4 +38,10 @@ public class Aircraft {
     @JoinColumn(name = "operational_base_id", nullable = false)
     private OperationalBase operationalBase;
 
+    public static void validateRegistrationNumber(String registrationNumber) {
+        if (registrationNumber == null || registrationNumber.isBlank()) {
+            throw new IllegalArgumentException("Registration number must not be blank");
+        }
+    }
+
 }
