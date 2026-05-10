@@ -44,7 +44,7 @@ services:
       - "8180:8080"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
-      - ./keycloak/themes:/opt/keycloak/themes
+      - ./keycloak/themes/skyroster:/opt/keycloak/themes/skyroster
     command: >
       start-dev
       --import-realm
