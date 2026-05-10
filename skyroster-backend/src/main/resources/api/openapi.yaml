@@ -249,7 +249,8 @@ components:
       required:
         - id
         - pilotName
-        - date
+        - startDateTime
+        - endDateTime
       properties:
         id:
           type: string
@@ -257,10 +258,14 @@ components:
         pilotName:
           type: string
           example: "Jan Kowalski"
-        date:
+        startDateTime:
           type: string
-          format: date
-          example: "2026-03-20"
+          format: date-time
+          example: "2026-03-20T08:00:00Z"
+        endDateTime:
+          type: string
+          format: date-time
+          example: "2026-03-20T11:00:00Z"
 
     AddAircraftRequest:
       type: object
