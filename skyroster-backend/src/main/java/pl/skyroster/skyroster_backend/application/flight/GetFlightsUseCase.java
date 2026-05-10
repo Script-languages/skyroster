@@ -2,8 +2,16 @@ package pl.skyroster.skyroster_backend.application.flight;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.skyroster.skyroster_backend.domain.model.Aircraft;
 import pl.skyroster.skyroster_backend.domain.model.Flight;
+import pl.skyroster.skyroster_backend.domain.port.AircraftRepository;
 import pl.skyroster.skyroster_backend.domain.port.FlightRepository;
+import pl.skyroster.skyroster_backend.generated.model.AircraftResponse;
+import pl.skyroster.skyroster_backend.generated.model.AircraftTypeInfo;
+import pl.skyroster.skyroster_backend.generated.model.FlightResponse;
+import pl.skyroster.skyroster_backend.infrastructure.mappers.AircraftResponseMapper;
+import pl.skyroster.skyroster_backend.infrastructure.mappers.AircraftTypeInfoMapper;
+import pl.skyroster.skyroster_backend.infrastructure.mappers.OperationalBaseInfoMapper;
 
 import java.util.List;
 
@@ -16,7 +24,19 @@ public class GetFlightsUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<Flight> execute() {
-        return flightRepository.findAll();
+    public List<FlightResponse> execute() {
+        return flightRepository.findAll().stream().map(flight -> {
+            var aircraftResponse = AircraftResponseMapper.map(flight.getAircraft());
+
+            return new FlightResponse(
+                    flight.getId(),
+                    aircraftResponse,
+                    flight.getFlightStart(),
+                    flight.getFlightEnd(),
+                    OperationalBaseInfoMapper.map(flight.getStartAirport()),
+                    OperationalBaseInfoMapper.map(flight.getEndAirport()),
+                    flight.getDescription()
+            );
+        }).toList();
     }
 }
