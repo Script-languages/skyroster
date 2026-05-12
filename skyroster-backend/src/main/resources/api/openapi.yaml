@@ -157,6 +157,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/flights:
+    get:
+      operationId: displayFlights
+      tags: [ Flight ]
+      summary: Display flights timetable
+      responses:
+        '200':
+          description: List of flights
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FlightResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/aircraft/{id}:
     put:
       operationId: updateAircraft
@@ -453,3 +480,36 @@ components:
           $ref: '#/components/schemas/AircraftTypeInfo'
         operationalBase:
           $ref: '#/components/schemas/OperationalBaseInfo'
+
+    FlightResponse:
+      type: object
+      required:
+        - id
+        - aircraft
+        - pilot
+        - flightStart
+        - flightEnd
+        - startAirport
+        - endAirport
+        - description
+      properties:
+        id:
+          type: string
+          format: uuid
+        aircraft:
+          $ref: '#/components/schemas/AircraftResponse'
+        flightStart:
+          type: string
+          format: date-time
+          example: "2026-06-20T08:00:00Z"
+        flightEnd:
+          type: string
+          format: date-time
+          example: "2026-06-20T11:00:00Z"
+        startAirport:
+          $ref: '#/components/schemas/OperationalBaseInfo'
+        endAirport:
+          $ref: '#/components/schemas/OperationalBaseInfo'
+        description:
+          type: string
+          example: "Lot rejsowy Kraków - Gdańsk"
