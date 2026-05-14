@@ -6,12 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import pl.skyroster.skyroster_backend.domain.exception.AircraftAlreadyExistsException;
-import pl.skyroster.skyroster_backend.domain.exception.AircraftHasAssignedFlightsException;
-import pl.skyroster.skyroster_backend.domain.exception.AircraftNotFoundException;
-import pl.skyroster.skyroster_backend.domain.exception.AircraftTypeNotFoundException;
-import pl.skyroster.skyroster_backend.domain.exception.OperationalBaseNotFoundException;
-import pl.skyroster.skyroster_backend.domain.exception.PilotNotFoundException;
+import pl.skyroster.skyroster_backend.domain.exception.*;
 import pl.skyroster.skyroster_backend.generated.model.ErrorResponse;
 
 import java.time.OffsetDateTime;
@@ -54,6 +49,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PilotNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlePilotNotFound(PilotNotFoundException ex,HttpServletRequest request) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(PilotAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handlePilotAlreadyExists(PilotAlreadyExistsException ex,HttpServletRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     @ExceptionHandler(OperationalBaseNotFoundException.class)

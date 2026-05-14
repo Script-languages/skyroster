@@ -19,6 +19,7 @@ public interface PilotRepository {
   Page<Pilot> findAllWithRelations(Pageable pageable);
   Optional<Pilot> findById(UUID id);
   boolean existsById(UUID id);
+  boolean existsByLicence(String licence);
   void deleteById(UUID id);
   Pilot save(Pilot pilot);
 }

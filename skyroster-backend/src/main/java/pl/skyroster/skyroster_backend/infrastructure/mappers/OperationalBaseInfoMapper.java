@@ -11,4 +11,12 @@ public class OperationalBaseInfoMapper {
                 operationalBase.getName()
         );
     }
+
+    public static OperationalBase fromInfo(OperationalBaseInfo operationalBase) {
+        return new OperationalBase(
+            operationalBase.getId(),
+            operationalBase.getIcaoCode(),
+            operationalBase.getName()
+        );
+    }
 }

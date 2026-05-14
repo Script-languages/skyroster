@@ -204,6 +204,50 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+    post:
+      tags:
+        - Pilots
+      summary: Add a new pilot
+      description: Creates a new pilot in the system.
+      operationId: createPilot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PilotRequest'
+      responses:
+        '201':
+          description: Pilot created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PilotResponse'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Pilot already exists, for example duplicate license number or email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/flights:
     get:
       operationId: displayFlights
@@ -563,6 +607,34 @@ components:
           type: string
           example: Jan
         surname:
+          type: string
+          example: Kowalski
+        homeBase:
+          $ref: '#/components/schemas/OperationalBaseInfo'
+        qualifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/PilotQualificationInfo'
+        aircraftTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AircraftTypeInfo'
+
+    PilotRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - homeBase
+        - qualifications
+      properties:
+        licence:
+          type: string
+          example: PIL-001
+        firstName:
+          type: string
+          example: Jan
+        lastName:
           type: string
           example: Kowalski
         homeBase:
