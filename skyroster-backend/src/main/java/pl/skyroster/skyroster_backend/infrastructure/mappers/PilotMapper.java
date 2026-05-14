@@ -27,7 +27,7 @@ public class PilotMapper {
             pilot.getAircraftTypes()
                 .stream()
                 .sorted(Comparator.comparing(AircraftType::getName))
-                .map(AircraftTypeInfoMapper::map)
+                .map(AircraftTypeInfoMapper::toAircraftTypeInfo)
                 .toList());
   }
 }

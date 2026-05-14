@@ -10,4 +10,8 @@ public class PilotQualificationMapper {
         .values(qualification.getValue())
         .label(qualification.getLabel());
   }
+
+  public static Qualification fromPilotQualificationInfo(PilotQualificationInfo qualification) {
+    return new Qualification(qualification.getId(), qualification.getValues(), qualification.getLabel());
+  }
 }

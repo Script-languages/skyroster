@@ -344,6 +344,61 @@ paths:
         '404':
           description: Pilot not found
 
+    patch:
+      tags:
+        - Pilots
+      summary: Partially update a pilot
+      description: Updates selected pilot fields. Fields omitted from the request body remain unchanged.
+      operationId: patchPilot
+      parameters:
+        - name: pilotId
+          in: path
+          required: true
+          description: Pilot ID
+          schema:
+            type: string
+            format: uuid
+          example: 0b7a9c1d-86c2-49dc-8ef8-d7f6c7e6e6f1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PilotPatchRequest'
+            examples:
+              updateBasicData:
+                summary: Update pilot basic data
+                value:
+                  name: Jan
+                  surname: Kowalski
+                  licence: ATPL-123456
+              updateOperationalBase:
+                summary: Update pilot operational base
+                value:
+                  operationalBaseId: 2a9dfd20-90fc-4b7e-a996-358d4b5f79c7
+              updateQualificationsAndAircraftTypes:
+                summary: Update qualifications and aircraft types
+                value:
+                  qualifications:
+                    - PPL
+                    - CPL
+                    - ATPL
+                  aircraftTypes:
+                    - A320
+                    - B737
+      responses:
+        '200':
+          description: Pilot updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PilotResponse'
+        '400':
+          description: Invalid request body
+        '404':
+          description: Pilot not found
+
+
 components:
   securitySchemes:
     bearerAuth:
@@ -518,6 +573,40 @@ components:
             $ref: '#/components/schemas/PilotQualificationInfo'
         aircraftTypes:
           type: array
+          items:
+            $ref: '#/components/schemas/AircraftTypeInfo'
+
+    PilotPatchRequest:
+      type: object
+      description: Request body for partially updating a pilot. Null or omitted fields are not changed.
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Pilot name
+          example: Jan
+        surname:
+          type: string
+          description: Pilot surname
+          example: Kowalski
+        licence:
+          type: string
+          description: Pilot licence number
+          example: ATPL-123456
+        operationalBaseIcaoCode:
+          type: string
+          description: ICAO operational base code
+          example: "EPWA"
+        qualifications:
+          type: array
+          description: Pilot qualifications. If provided, replaces the current qualification set.
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/PilotQualificationInfo'
+        aircraftTypes:
+          type: array
+          description: Aircraft types assigned to the pilot. If provided, replaces the current aircraft type set.
+          uniqueItems: true
           items:
             $ref: '#/components/schemas/AircraftTypeInfo'
 

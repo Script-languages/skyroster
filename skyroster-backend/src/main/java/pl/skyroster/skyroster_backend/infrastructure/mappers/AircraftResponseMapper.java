@@ -8,7 +8,7 @@ public class AircraftResponseMapper {
         return new AircraftResponse(
                 aircraft.getId(),
                 aircraft.getRegistrationNumber(),
-                AircraftTypeInfoMapper.map(aircraft.getAircraftType()),
+                AircraftTypeInfoMapper.toAircraftTypeInfo(aircraft.getAircraftType()),
                 OperationalBaseInfoMapper.map(aircraft.getOperationalBase())
         );
     }
