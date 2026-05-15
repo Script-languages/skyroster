@@ -89,7 +89,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OperationalBaseNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleOperationalBaseNotFound(OperationalBaseNotFoundException ex,
                                                                         HttpServletRequest request) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
