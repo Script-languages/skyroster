@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import { useAircraftStore } from '../stores/aircraft'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
@@ -18,6 +18,10 @@ const confirm = useConfirm()
 const dialogVisible = ref(false)
 const selectedAircraft = ref(null)
 const isEditMode = ref(false)
+
+onMounted(async () => {
+  await aircraftStore.fetchAircraftList();
+});
 
 function getTypeLabel(typeCode) {
   const type = aircraftStore.aircraftTypeOptions.find(t => t.value === typeCode)

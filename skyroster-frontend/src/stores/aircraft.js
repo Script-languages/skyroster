@@ -1,18 +1,50 @@
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
-import { initialAircraft, AIRCRAFT_TYPES, BASES, AVAILABILITY_STATUSES } from '../data/mockData'
+import {computed, ref} from 'vue'
+import {defineStore} from 'pinia'
+import apiClient from '../api/axios'
+import {AIRCRAFT_TYPES, AVAILABILITY_STATUSES, BASES} from '../data/mockData'
+
+async function getAircraftList() {
+  const res = await apiClient.get('http://localhost:8001/api/aircraft', {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!res.ok) {
+    let errorData = {};
+
+    try {
+      errorData = await res.json();
+    } catch {
+      errorData = {message: 'Failed to fetch aircraft data'};
+    }
+
+    const error = new Error(
+      errorData.message || 'Failed to fetch aircraft data'
+    );
+
+    error.code = errorData.code;
+    throw error;
+  }
+
+  return await res.json();
+}
 
 export const useAircraftStore = defineStore('aircraft', () => {
-  const aircraft = ref([...initialAircraft])
+  const aircraft = ref([]);
   const aircraftTypeOptions = AIRCRAFT_TYPES
   const baseOptions = BASES
   const availabilityOptions = AVAILABILITY_STATUSES
 
   const aircraftCount = computed(() => aircraft.value.length)
-  
-  const availableAircraft = computed(() => 
+
+  const availableAircraft = computed(() =>
     aircraft.value.filter(a => a.dostepnosc === 'dostepny')
   )
+
+  async function fetchAircraftList() {
+    aircraft.value = await getAircraftList();
+  }
 
   function generateId() {
     const maxId = aircraft.value.reduce((max, a) => {
@@ -74,6 +106,7 @@ export const useAircraftStore = defineStore('aircraft', () => {
     deleteAircraft,
     getAircraftById,
     getAircraftDisplay,
-    getAvailabilityInfo
+    getAvailabilityInfo,
+    fetchAircraftList
   }
 })
