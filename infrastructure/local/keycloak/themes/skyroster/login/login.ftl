@@ -1,6 +1,8 @@
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password'); section>
-  <#if section = "form">
+  <#if section = "header">
+    ${msg("loginAccountTitle")}
+  <#elseif section = "form">
     <form id="kc-form-login" action="${url.loginAction}" method="post" novalidate="novalidate">
 
       <div class="sr-field">

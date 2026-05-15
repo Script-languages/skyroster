@@ -17,9 +17,7 @@
     <section class="sr-card">
       <header class="sr-card__header">
         <h1 class="sr-brand">SkyRoster</h1>
-        <#if !(auth?has_content && auth.showUsername() && !auth.showResetCredentials())>
-          <p class="sr-card__subtitle">${msg("loginAccountTitle")}</p>
-        </#if>
+        <p class="sr-card__subtitle"><#nested "header"></p>
       </header>
 
       <#if displayMessage && message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>

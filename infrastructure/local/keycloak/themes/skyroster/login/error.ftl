@@ -9,7 +9,7 @@
     <#if client?? && client.baseUrl?has_content>
       <a href="${client.baseUrl}" class="sr-button sr-button--secondary">${msg("backToLogin")}</a>
     <#else>
-      <a href="/" class="sr-button sr-button--secondary">${msg("backToLogin")}</a>
+      <a href="${url.loginRestartFlowUrl!''}" class="sr-button sr-button--secondary">${msg("backToLogin")}</a>
     </#if>
   </#if>
 </@layout.registrationLayout>

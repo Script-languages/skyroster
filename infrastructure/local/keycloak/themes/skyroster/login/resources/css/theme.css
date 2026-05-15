@@ -189,7 +189,7 @@ html, body {
   font-weight: 600;
   border-radius: var(--sr-radius-input);
   cursor: pointer;
-  transition: background-color 120ms, transform 60ms;
+  transition: background-color 120ms, border-color 120ms, transform 60ms;
   border: 1px solid transparent;
 }
 
@@ -224,4 +224,9 @@ html, body {
 .sr-button--secondary:hover {
   background: var(--sr-surface-50);
   border-color: var(--sr-primary-500);
+}
+
+.sr-button--secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--sr-ring-strong);
 }
