@@ -1,4 +1,4 @@
-<#macro registrationLayout displayInfo=false displayMessage=true displayRequiredFields=false showAnotherWayIfPresent=true>
+<#macro registrationLayout displayInfo=false displayMessage=true displayRequiredFields=false>
 <!DOCTYPE html>
 <html lang="${locale.currentLanguageTag}">
 <head>
@@ -14,7 +14,7 @@
 </head>
 <body class="sr-body">
   <main class="sr-card-wrapper">
-    <section class="sr-card" role="main">
+    <section class="sr-card">
       <header class="sr-card__header">
         <h1 class="sr-brand">SkyRoster</h1>
         <#if !(auth?has_content && auth.showUsername() && !auth.showResetCredentials())>
