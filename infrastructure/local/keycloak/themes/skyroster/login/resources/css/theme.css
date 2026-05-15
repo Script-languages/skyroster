@@ -127,3 +127,82 @@ html, body {
   .sr-card-wrapper { padding: 16px; }
   .sr-card { padding: 24px; }
 }
+
+.sr-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sr-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sr-text);
+}
+
+.sr-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--sr-font);
+  color: var(--sr-text);
+  background: var(--sr-surface-0);
+  border: 1px solid var(--sr-border);
+  border-radius: var(--sr-radius-input);
+  transition: border-color 120ms, box-shadow 120ms;
+}
+
+.sr-input:focus {
+  outline: none;
+  border-color: var(--sr-primary-500);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.sr-input[aria-invalid="true"] {
+  border-color: var(--sr-danger);
+}
+
+.sr-field__error {
+  font-size: 12px;
+  color: var(--sr-danger);
+}
+
+.sr-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--sr-text-muted);
+}
+
+.sr-checkbox input[type="checkbox"] {
+  accent-color: var(--sr-primary-500);
+  width: 16px;
+  height: 16px;
+}
+
+.sr-button {
+  font-family: var(--sr-font);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--sr-radius-input);
+  cursor: pointer;
+  transition: background-color 120ms, transform 60ms;
+  border: 1px solid transparent;
+}
+
+.sr-button:active { transform: translateY(1px); }
+
+.sr-button--primary {
+  width: 100%;
+  height: 44px;
+  background: var(--sr-primary-500);
+  color: #ffffff;
+}
+
+.sr-button--primary:hover { background: var(--sr-primary-600); }
+
+.sr-button--primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+}
