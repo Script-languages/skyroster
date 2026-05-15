@@ -48,6 +48,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/planning/**").hasRole("schedule_planner")
                         .requestMatchers(HttpMethod.POST, "/api/aircraft/**").hasRole("operations_administrator")
                         .requestMatchers(HttpMethod.GET, "/api/aircraft/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/pilots/**").hasRole("operations_administrator")
+                        .requestMatchers(HttpMethod.PATCH, "/api/pilots/**").hasRole("operations_administrator")
+                        .requestMatchers(HttpMethod.POST, "/api/pilots/**").hasRole("operations_administrator")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll()
                 )
@@ -64,7 +67,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         var config = new CorsConfiguration();
         config.setAllowedOrigins(allowedOrigins);
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

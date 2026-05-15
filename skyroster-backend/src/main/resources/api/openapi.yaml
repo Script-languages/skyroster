@@ -5,15 +5,15 @@ info:
   version: 0.1.0
 
 security:
-  - bearerAuth: []
+  - bearerAuth: [ ]
 
 paths:
   /api/health:
     get:
       operationId: getHealth
-      tags: [Health]
+      tags: [ Health ]
       summary: Health check
-      security: []
+      security: [ ]
       responses:
         '200':
           description: Service is healthy
@@ -25,7 +25,7 @@ paths:
   /api/me:
     get:
       operationId: getCurrentUser
-      tags: [User]
+      tags: [ User ]
       summary: Get current authenticated user info
       responses:
         '200':
@@ -44,7 +44,7 @@ paths:
   /api/compliance/reports:
     get:
       operationId: getComplianceReports
-      tags: [Compliance]
+      tags: [ Compliance ]
       summary: List compliance reports
       responses:
         '200':
@@ -71,7 +71,7 @@ paths:
   /api/planning/schedules:
     get:
       operationId: getPlanningSchedules
-      tags: [Planning]
+      tags: [ Planning ]
       summary: List schedules
       responses:
         '200':
@@ -98,7 +98,7 @@ paths:
   /api/aircraft:
     post:
       operationId: addAircraft
-      tags: [Aircraft]
+      tags: [ Aircraft ]
       summary: Add a new aircraft to the fleet
       requestBody:
         required: true
@@ -139,7 +139,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     get:
       operationId: getAircraft
-      tags: [Aircraft]
+      tags: [ Aircraft ]
       summary: List all aircraft in the fleet
       responses:
         '200':
@@ -152,6 +152,97 @@ paths:
                   $ref: '#/components/schemas/AircraftResponse'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/pilots:
+    get:
+      tags:
+        - Pilots
+      operationId: getPilots
+      summary: Get paginated list of pilots
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            example: surname,asc
+      responses:
+        '200':
+          description: Paginated list of pilots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPilotResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Pilots
+      summary: Add a new pilot
+      description: Creates a new pilot in the system.
+      operationId: createPilot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PilotRequest'
+      responses:
+        '201':
+          description: Pilot created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PilotResponse'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Pilot already exists, for example duplicate license number or email
           content:
             application/json:
               schema:
@@ -187,7 +278,7 @@ paths:
   /api/aircraft/{id}:
     put:
       operationId: updateAircraft
-      tags: [Aircraft]
+      tags: [ Aircraft ]
       summary: Update an aircraft in the fleet
       parameters:
         - in: path
@@ -241,7 +332,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: deleteAircraft
-      tags: [Aircraft]
+      tags: [ Aircraft ]
       summary: Delete an aircraft from the fleet
       parameters:
         - in: path
@@ -277,6 +368,80 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/pilots/{pilotId}:
+    delete:
+      tags:
+        - AdminPilots
+      operationId: deletePilotById
+      summary: Delete pilot by id
+      parameters:
+        - name: pilotId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Pilot deleted successfully
+        '404':
+          description: Pilot not found
+
+    patch:
+      tags:
+        - Pilots
+      summary: Partially update a pilot
+      description: Updates selected pilot fields. Fields omitted from the request body remain unchanged.
+      operationId: patchPilot
+      parameters:
+        - name: pilotId
+          in: path
+          required: true
+          description: Pilot ID
+          schema:
+            type: string
+            format: uuid
+          example: 0b7a9c1d-86c2-49dc-8ef8-d7f6c7e6e6f1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PilotPatchRequest'
+            examples:
+              updateBasicData:
+                summary: Update pilot basic data
+                value:
+                  name: Jan
+                  surname: Kowalski
+                  licence: ATPL-123456
+              updateOperationalBase:
+                summary: Update pilot operational base
+                value:
+                  operationalBaseId: 2a9dfd20-90fc-4b7e-a996-358d4b5f79c7
+              updateQualificationsAndAircraftTypes:
+                summary: Update qualifications and aircraft types
+                value:
+                  qualifications:
+                    - PPL
+                    - CPL
+                    - ATPL
+                  aircraftTypes:
+                    - A320
+                    - B737
+      responses:
+        '200':
+          description: Pilot updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PilotResponse'
+        '400':
+          description: Invalid request body
+        '404':
+          description: Pilot not found
+
 
 components:
   securitySchemes:
@@ -336,7 +501,7 @@ components:
           description: List of realm roles assigned to the user
           items:
             type: string
-          example: ["operations_administrator"]
+          example: [ "operations_administrator" ]
 
     HealthStatus:
       type: object
@@ -387,6 +552,153 @@ components:
           type: string
           format: date-time
           example: "2026-03-20T11:00:00Z"
+
+    PagedPilotResponse:
+      type: object
+      required:
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PilotResponse'
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 20
+        totalElements:
+          type: integer
+          format: int64
+          example: 42
+        totalPages:
+          type: integer
+          example: 3
+        first:
+          type: boolean
+          example: true
+        last:
+          type: boolean
+          example: false
+
+    PilotResponse:
+      type: object
+      required:
+        - id
+        - firstName
+        - surname
+        - homeBase
+        - qualifications
+      properties:
+        id:
+          type: string
+          format: uuid
+        licence:
+          type: string
+          example: PIL-001
+        firstName:
+          type: string
+          example: Jan
+        surname:
+          type: string
+          example: Kowalski
+        homeBase:
+          $ref: '#/components/schemas/OperationalBaseInfo'
+        qualifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/PilotQualificationInfo'
+        aircraftTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AircraftTypeInfo'
+
+    PilotRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - homeBase
+        - qualifications
+      properties:
+        licence:
+          type: string
+          example: PIL-001
+        firstName:
+          type: string
+          example: Jan
+        lastName:
+          type: string
+          example: Kowalski
+        homeBase:
+          $ref: '#/components/schemas/OperationalBaseInfo'
+        qualifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/PilotQualificationInfo'
+        aircraftTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AircraftTypeInfo'
+
+    PilotPatchRequest:
+      type: object
+      description: Request body for partially updating a pilot. Null or omitted fields are not changed.
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Pilot name
+          example: Jan
+        surname:
+          type: string
+          description: Pilot surname
+          example: Kowalski
+        licence:
+          type: string
+          description: Pilot licence number
+          example: ATPL-123456
+        operationalBaseIcaoCode:
+          type: string
+          description: ICAO operational base code
+          example: "EPWA"
+        qualifications:
+          type: array
+          description: Pilot qualifications. If provided, replaces the current qualification set.
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/PilotQualificationInfo'
+        aircraftTypes:
+          type: array
+          description: Aircraft types assigned to the pilot. If provided, replaces the current aircraft type set.
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/AircraftTypeInfo'
+
+
+    PilotQualificationInfo:
+      type: object
+      required:
+        - id
+        - aircraftType
+        - licenseValidUntil
+      properties:
+        id:
+          type: string
+          format: uuid
+        values:
+          type: string
+        label:
+          type: string
+
+
 
     AddAircraftRequest:
       type: object
