@@ -130,10 +130,20 @@ html, body {
   .sr-card { padding: 24px; }
 }
 
+#kc-form-login {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .sr-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.sr-field__error:empty {
+  display: none;
 }
 
 .sr-label {
