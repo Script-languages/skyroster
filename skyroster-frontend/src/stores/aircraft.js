@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { initialAircraft, AIRCRAFT_TYPES, BASES, AVAILABILITY_STATUSES } from '../data/mockData'
+import apiClient from '../api/axios'
 
 export const useAircraftStore = defineStore('aircraft', () => {
   const aircraft = ref([...initialAircraft])
@@ -62,6 +63,38 @@ export const useAircraftStore = defineStore('aircraft', () => {
     return availabilityOptions.find(s => s.value === status)
   }
 
+  async function loadAircraft() {
+    try {
+      const { data } = await apiClient.get('/aircraft')
+      aircraft.value = data.map(a => ({
+        id: a.id,
+        rejestracja: a.registrationNumber,
+        typ: a.aircraftType.icaoCode,
+        typId: a.aircraftType.id,
+        baza: a.operationalBase.icaoCode,
+        bazaId: a.operationalBase.id,
+        dostepnosc: 'dostepny'
+      }))
+      return true
+    } catch (e) {
+      console.error('loadAircraft failed', e)
+      return false
+    }
+  }
+
+  async function loadAvailableAircraft({ from, to, baseId }) {
+    const params = { from, to }
+    if (baseId) params.baseId = baseId
+    const { data } = await apiClient.get('/aircraft/availability', { params })
+    return data.map(a => ({
+      id: a.id,
+      rejestracja: a.registrationNumber,
+      typ: a.aircraftType.icaoCode,
+      typId: a.aircraftType.id,
+      baza: a.operationalBase.icaoCode
+    }))
+  }
+
   return {
     aircraft,
     aircraftCount,
@@ -74,6 +107,8 @@ export const useAircraftStore = defineStore('aircraft', () => {
     deleteAircraft,
     getAircraftById,
     getAircraftDisplay,
-    getAvailabilityInfo
+    getAvailabilityInfo,
+    loadAircraft,
+    loadAvailableAircraft
   }
 })
