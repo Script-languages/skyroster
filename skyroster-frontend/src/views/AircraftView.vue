@@ -110,11 +110,11 @@ function confirmDelete(aircraft) {
           {{ getBaseLabel(data.baza) }}
         </template>
       </Column>
-      <Column field="dostepnosc" header="Dostępność" sortable>
+<!--      <Column field="dostepnosc" header="Dostępność" sortable>
         <template #body="{ data }">
           <Tag :value="getAvailabilityLabel(data.dostepnosc)" :severity="getAvailabilitySeverity(data.dostepnosc)" />
         </template>
-      </Column>
+      </Column>-->
       <Column header="Akcje" :exportable="false" style="min-width: 8rem">
         <template #body="{ data }">
           <div class="action-buttons">

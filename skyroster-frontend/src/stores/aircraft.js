@@ -10,24 +10,7 @@ async function getAircraftList() {
     }
   });
 
-  if (!res.ok) {
-    let errorData = {};
-
-    try {
-      errorData = await res.json();
-    } catch {
-      errorData = {message: 'Failed to fetch aircraft data'};
-    }
-
-    const error = new Error(
-      errorData.message || 'Failed to fetch aircraft data'
-    );
-
-    error.code = errorData.code;
-    throw error;
-  }
-
-  return await res.json();
+  return res.data;
 }
 
 export const useAircraftStore = defineStore('aircraft', () => {
@@ -43,7 +26,18 @@ export const useAircraftStore = defineStore('aircraft', () => {
   )
 
   async function fetchAircraftList() {
-    aircraft.value = await getAircraftList();
+    try {
+      const response = await getAircraftList();
+
+      aircraft.value = response.map(aircraft => ({
+        id: aircraft.id,
+        rejestracja: aircraft.registrationNumber,
+        typ: aircraft.aircraftType.icaoCode,
+        baza: aircraft.operationalBase.icaoCode
+      }));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function generateId() {
