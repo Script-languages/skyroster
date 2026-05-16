@@ -1,14 +1,14 @@
 <script setup>
-import { ref } from 'vue'
-import { useAircraftStore } from '../stores/aircraft'
-import { useToast } from 'primevue/usetoast'
-import { useConfirm } from 'primevue/useconfirm'
+import {onMounted, ref} from 'vue'
+import {useAircraftStore} from '../stores/aircraft'
+import {useToast} from 'primevue/usetoast'
+import {useConfirm} from 'primevue/useconfirm'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
-import Tag from 'primevue/tag'
+// import Tag from 'primevue/tag'
 import AircraftDialog from '../components/aircraft/AircraftDialog.vue'
 
 const aircraftStore = useAircraftStore()
@@ -18,6 +18,10 @@ const confirm = useConfirm()
 const dialogVisible = ref(false)
 const selectedAircraft = ref(null)
 const isEditMode = ref(false)
+
+onMounted(async () => {
+  await aircraftStore.fetchAircraftList();
+});
 
 function getTypeLabel(typeCode) {
   const type = aircraftStore.aircraftTypeOptions.find(t => t.value === typeCode)
@@ -29,7 +33,7 @@ function getBaseLabel(baseCode) {
   return base ? base.label : baseCode
 }
 
-function getAvailabilitySeverity(status) {
+/*function getAvailabilitySeverity(status) {
   const info = aircraftStore.getAvailabilityInfo(status)
   return info ? info.severity : 'secondary'
 }
@@ -37,7 +41,7 @@ function getAvailabilitySeverity(status) {
 function getAvailabilityLabel(status) {
   const info = aircraftStore.getAvailabilityInfo(status)
   return info ? info.label : status
-}
+}*/
 
 function openAddDialog() {
   selectedAircraft.value = null
@@ -68,11 +72,27 @@ function confirmDelete(aircraft) {
     icon: 'pi pi-exclamation-triangle',
     acceptLabel: 'Tak, usuń',
     rejectLabel: 'Anuluj',
-    accept: () => {
-      aircraftStore.deleteAircraft(aircraft.id)
-      toast.add({ severity: 'success', summary: 'Sukces', detail: 'Samolot został usunięty', life: 3000 })
+
+    accept: async () => {
+      const result = await aircraftStore.deleteAircraft(aircraft.id);
+
+      if (result.success) {
+        toast.add({
+          severity: 'success',
+          summary: 'Sukces',
+          detail: 'Samolot został usunięty',
+          life: 3000
+        });
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Błąd',
+          detail: result.message,
+          life: 5000
+        });
+      }
     }
-  })
+  });
 }
 </script>
 
@@ -106,11 +126,11 @@ function confirmDelete(aircraft) {
           {{ getBaseLabel(data.baza) }}
         </template>
       </Column>
-      <Column field="dostepnosc" header="Dostępność" sortable>
+<!--      <Column field="dostepnosc" header="Dostępność" sortable>
         <template #body="{ data }">
           <Tag :value="getAvailabilityLabel(data.dostepnosc)" :severity="getAvailabilitySeverity(data.dostepnosc)" />
         </template>
-      </Column>
+      </Column>-->
       <Column header="Akcje" :exportable="false" style="min-width: 8rem">
         <template #body="{ data }">
           <div class="action-buttons">
