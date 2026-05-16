@@ -2,6 +2,10 @@
   "realm": "skyroster",
   "enabled": true,
   "sslRequired": "none",
+  "loginTheme": "skyroster",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["pl", "en"],
+  "defaultLocale": "pl",
   "roles": {
     "realm": [
       { "name": "operations_administrator", "composite": false },
