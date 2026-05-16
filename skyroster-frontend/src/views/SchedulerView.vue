@@ -11,6 +11,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
 import FlightScheduler from '../components/scheduler/FlightScheduler.vue'
+import FlightWizardDialog from '../components/scheduler/FlightWizardDialog.vue'
 import { BASES } from '../data/mockData' // Add BASES import
 
 const flightsStore = useFlightsStore()
@@ -20,14 +21,26 @@ const toast = useToast()
 
 const schedulerRef = ref(null)
 const dialogVisible = ref(false)
+const wizardVisible = ref(false)
 const isEditMode = ref(false)
 const selectedFlight = ref(null)
 
 const flightForm = ref(getEmptyForm())
 
 onMounted(async () => {
-  await Promise.all([aircraftStore.fetchAircraftList(), flightsStore.loadPlanningSchedules()]);
+  await Promise.all([
+    aircraftStore.loadAircraft(),
+    aircraftStore.fetchAircraftList(),
+    pilotsStore.loadPilots(),
+    flightsStore.loadFlights(),
+    flightsStore.loadPlanningSchedules()
+  ])
 })
+
+async function onFlightCreated() {
+  toast.add({ severity: 'success', summary: 'Sukces', detail: 'Lot został utworzony', life: 3000 })
+  await flightsStore.loadFlights()
+}
 
 const baseOptions = BASES.map(b => ({
   label: `${b.value} - ${b.label}`,
@@ -138,10 +151,7 @@ function handleTimeRangeSelected(selection) {
 }
 
 function openAddDialog() {
-  selectedFlight.value = null
-  isEditMode.value = false
-  flightForm.value = getEmptyForm()
-  dialogVisible.value = true
+  wizardVisible.value = true
 }
 
 function saveFlight() {
@@ -332,6 +342,8 @@ function navigateNext() {
         </div>
       </template>
     </Dialog>
+
+    <FlightWizardDialog v-model:visible="wizardVisible" @created="onFlightCreated" />
   </div>
 </template>
 

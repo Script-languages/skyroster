@@ -107,7 +107,7 @@ class AircraftIntegrationTest {
     }
 
     @Test
-    void addAircraft_shouldReturn400_whenOperationalBaseNotFound() throws Exception {
+    void addAircraft_shouldReturn404_whenOperationalBaseNotFound() throws Exception {
         String token = getToken("admin", "test1234");
         String body = """
                 {
@@ -121,8 +121,8 @@ class AircraftIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(400));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
@@ -292,7 +292,7 @@ class AircraftIntegrationTest {
     }
 
     @Test
-    void updateAircraft_shouldReturn400_whenOperationalBaseNotFound() throws Exception {
+    void updateAircraft_shouldReturn404_whenOperationalBaseNotFound() throws Exception {
         String token = getToken("admin", "test1234");
         UUID aircraftId = createAircraft(token, "SP-BAS", "B738", "EPWA");
 
@@ -307,7 +307,7 @@ class AircraftIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test

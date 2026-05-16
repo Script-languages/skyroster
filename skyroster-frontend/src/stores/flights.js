@@ -11,21 +11,52 @@ export const useFlightsStore = defineStore('flights', () => {
 
   const flightsCount = computed(() => flights.value.length)
 
-  function generateId() {
-    const maxId = flights.value.reduce((max, flight) => {
-      const num = parseInt(flight.id.replace('F', ''))
-      return num > max ? num : max
-    }, 0)
-    return `F${String(maxId + 1).padStart(3, '0')}`
+  async function addFlight(flightData) {
+    try {
+      const { data } = await apiClient.post('/flights', flightData)
+      const mapped = {
+        id: data.id,
+        aircraftId: data.aircraft?.id,
+        pilotId: data.pilot?.id ?? null,
+        start: data.flightStart,
+        end: data.flightEnd,
+        text: data.startAirport && data.endAirport
+          ? `${data.startAirport.icaoCode} → ${data.endAirport.icaoCode}`
+          : '',
+        description: data.description
+      }
+      flights.value.push(mapped)
+      return { ok: true, flight: mapped }
+    } catch (e) {
+      if (e.response?.status === 422) {
+        return { ok: false, status: 422, violations: e.response.data.violations ?? [] }
+      }
+      if (e.response?.status === 409) {
+        return { ok: false, status: 409, message: e.response.data?.message ?? 'Konflikt zasobu' }
+      }
+      return { ok: false, status: e.response?.status ?? 500, message: e.response?.data?.message ?? e.message }
+    }
   }
 
-  function addFlight(flightData) {
-    const newFlight = {
-      ...flightData,
-      id: generateId()
+  async function loadFlights() {
+    try {
+      const { data } = await apiClient.get('/flights')
+      flights.value = data.map(f => ({
+        id: f.id,
+        aircraftId: f.aircraft?.id,
+        pilotId: f.pilot?.id ?? null,
+        start: f.flightStart,
+        end: f.flightEnd,
+        text: f.startAirport && f.endAirport
+          ? `${f.startAirport.icaoCode} → ${f.endAirport.icaoCode}`
+          : '',
+        description: f.description
+      }))
+      return true
+    } catch (e) {
+      console.error('loadFlights failed', e)
+      return false
     }
-    flights.value.push(newFlight)
-    return newFlight
   }
 
   function updateFlight(id, flightData) {
@@ -189,6 +220,7 @@ export const useFlightsStore = defineStore('flights', () => {
     updateFlight,
     deleteFlight,
     loadPlanningSchedules,
+    loadFlights,
     getFlightById,
     getSchedulerEvents,
     getSchedulerResources

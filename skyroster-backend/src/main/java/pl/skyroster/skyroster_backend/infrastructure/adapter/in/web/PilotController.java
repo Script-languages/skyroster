@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.skyroster.skyroster_backend.application.flight.GetAvailablePilotsUseCase;
 import pl.skyroster.skyroster_backend.application.pilot.AddPilotUseCase;
 import pl.skyroster.skyroster_backend.application.pilot.DeletePilotUseCase;
 import pl.skyroster.skyroster_backend.application.pilot.GetPilotUseCase;
@@ -13,7 +14,10 @@ import pl.skyroster.skyroster_backend.generated.model.PagedPilotResponse;
 import pl.skyroster.skyroster_backend.generated.model.PilotPatchRequest;
 import pl.skyroster.skyroster_backend.generated.model.PilotRequest;
 import pl.skyroster.skyroster_backend.generated.model.PilotResponse;
+import pl.skyroster.skyroster_backend.infrastructure.mappers.PilotMapper;
 
+import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -24,6 +28,18 @@ public class PilotController {
   private final DeletePilotUseCase deletePilotUseCase;
   private final PatchPilotUseCase patchPilotUseCase;
   private final AddPilotUseCase addPilotUseCase;
+  private final GetAvailablePilotsUseCase getAvailablePilotsUseCase;
+
+  @GetMapping(ApiApi.PATH_GET_AVAILABLE_PILOTS)
+  public ResponseEntity<List<PilotResponse>> getAvailablePilots(
+          @RequestParam("from") OffsetDateTime from,
+          @RequestParam("to") OffsetDateTime to,
+          @RequestParam(value = "aircraftTypeId", required = false) UUID aircraftTypeId) {
+      List<PilotResponse> response = getAvailablePilotsUseCase.execute(from, to, aircraftTypeId).stream()
+              .map(PilotMapper::toResponse)
+              .toList();
+      return ResponseEntity.ok(response);
+  }
 
   @GetMapping(ApiApi.PATH_GET_PILOTS)
   public ResponseEntity<PagedPilotResponse> getPilots(@RequestParam Integer page, @RequestParam Integer size, @RequestParam @Nullable String sort) {

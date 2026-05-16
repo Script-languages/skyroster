@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.skyroster.skyroster_backend.application.aircraft.AddAircraftUseCase;
 import pl.skyroster.skyroster_backend.application.aircraft.DeleteAircraftUseCase;
 import pl.skyroster.skyroster_backend.application.aircraft.GetAircraftUseCase;
 import pl.skyroster.skyroster_backend.application.aircraft.UpdateAircraftUseCase;
+import pl.skyroster.skyroster_backend.application.flight.GetAvailableAircraftUseCase;
 import pl.skyroster.skyroster_backend.domain.model.Aircraft;
 import pl.skyroster.skyroster_backend.generated.api.ApiApi;
 import pl.skyroster.skyroster_backend.generated.model.AddAircraftRequest;
@@ -20,7 +22,9 @@ import pl.skyroster.skyroster_backend.generated.model.AircraftResponse;
 import pl.skyroster.skyroster_backend.generated.model.AircraftTypeInfo;
 import pl.skyroster.skyroster_backend.generated.model.OperationalBaseInfo;
 import pl.skyroster.skyroster_backend.generated.model.UpdateAircraftRequest;
+import pl.skyroster.skyroster_backend.infrastructure.mappers.AircraftResponseMapper;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,15 +35,29 @@ public class AircraftController {
     private final GetAircraftUseCase getAircraftUseCase;
     private final UpdateAircraftUseCase updateAircraftUseCase;
     private final DeleteAircraftUseCase deleteAircraftUseCase;
+    private final GetAvailableAircraftUseCase getAvailableAircraftUseCase;
 
     public AircraftController(AddAircraftUseCase addAircraftUseCase,
                               GetAircraftUseCase getAircraftUseCase,
                               UpdateAircraftUseCase updateAircraftUseCase,
-                              DeleteAircraftUseCase deleteAircraftUseCase) {
+                              DeleteAircraftUseCase deleteAircraftUseCase,
+                              GetAvailableAircraftUseCase getAvailableAircraftUseCase) {
         this.addAircraftUseCase = addAircraftUseCase;
         this.getAircraftUseCase = getAircraftUseCase;
         this.updateAircraftUseCase = updateAircraftUseCase;
         this.deleteAircraftUseCase = deleteAircraftUseCase;
+        this.getAvailableAircraftUseCase = getAvailableAircraftUseCase;
+    }
+
+    @GetMapping(ApiApi.PATH_GET_AVAILABLE_AIRCRAFT)
+    public ResponseEntity<List<AircraftResponse>> getAvailableAircraft(
+            @RequestParam("from") OffsetDateTime from,
+            @RequestParam("to") OffsetDateTime to,
+            @RequestParam(value = "baseId", required = false) UUID baseId) {
+        List<AircraftResponse> response = getAvailableAircraftUseCase.execute(from, to, baseId).stream()
+                .map(AircraftResponseMapper::map)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(ApiApi.PATH_ADD_AIRCRAFT)

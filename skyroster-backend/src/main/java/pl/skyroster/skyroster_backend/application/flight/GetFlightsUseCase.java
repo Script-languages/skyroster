@@ -4,8 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.skyroster.skyroster_backend.domain.port.FlightRepository;
 import pl.skyroster.skyroster_backend.generated.model.FlightResponse;
-import pl.skyroster.skyroster_backend.infrastructure.mappers.AircraftResponseMapper;
-import pl.skyroster.skyroster_backend.infrastructure.mappers.OperationalBaseInfoMapper;
+import pl.skyroster.skyroster_backend.infrastructure.mappers.FlightResponseMapper;
 
 import java.util.List;
 
@@ -19,18 +18,8 @@ public class GetFlightsUseCase {
 
     @Transactional(readOnly = true)
     public List<FlightResponse> execute() {
-        return flightRepository.findAll().stream().map(flight -> {
-            var aircraftResponse = AircraftResponseMapper.map(flight.getAircraft());
-
-            return new FlightResponse(
-                    flight.getId(),
-                    aircraftResponse,
-                    flight.getFlightStart(),
-                    flight.getFlightEnd(),
-                    OperationalBaseInfoMapper.map(flight.getStartAirport()),
-                    OperationalBaseInfoMapper.map(flight.getEndAirport()),
-                    flight.getDescription()
-            );
-        }).toList();
+        return flightRepository.findAll().stream()
+                .map(FlightResponseMapper::map)
+                .toList();
     }
 }

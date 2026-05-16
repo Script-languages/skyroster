@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { initialPilots, QUALIFICATIONS, AIRCRAFT_TYPES, BASES } from '../data/mockData'
+import apiClient from '../api/axios'
 
 export const usePilotsStore = defineStore('pilots', () => {
   const pilots = ref([...initialPilots])
@@ -54,6 +55,37 @@ export const usePilotsStore = defineStore('pilots', () => {
     return pilot ? `${pilot.imie} ${pilot.nazwisko}` : ''
   }
 
+  async function loadPilots() {
+    try {
+      const { data } = await apiClient.get('/pilots', { params: { page: 0, size: 100 } })
+      const items = data.content ?? data ?? []
+      pilots.value = items.map(mapApiPilot)
+      return true
+    } catch (e) {
+      console.error('loadPilots failed', e)
+      return false
+    }
+  }
+
+  async function loadAvailablePilots({ from, to, aircraftTypeId }) {
+    const params = { from, to }
+    if (aircraftTypeId) params.aircraftTypeId = aircraftTypeId
+    const { data } = await apiClient.get('/pilots/availability', { params })
+    return data.map(mapApiPilot)
+  }
+
+  function mapApiPilot(p) {
+    return {
+      id: p.id,
+      imie: p.firstName ?? p.name ?? p.imie,
+      nazwisko: p.surname ?? p.nazwisko,
+      licencja: p.licence ?? p.licencja,
+      kwalifikacje: (p.qualifications ?? p.kwalifikacje ?? []).map(q => q.value ?? q),
+      typySamolotow: (p.aircraftTypes ?? p.typySamolotow ?? []).map(t => t.icaoCode ?? t),
+      bazaMacierzysta: p.homeBase?.icaoCode ?? p.operationalBase?.icaoCode ?? p.bazaMacierzysta ?? null
+    }
+  }
+
   return {
     pilots,
     pilotsCount,
@@ -64,6 +96,8 @@ export const usePilotsStore = defineStore('pilots', () => {
     updatePilot,
     deletePilot,
     getPilotById,
-    getPilotFullName
+    getPilotFullName,
+    loadPilots,
+    loadAvailablePilots
   }
 })
