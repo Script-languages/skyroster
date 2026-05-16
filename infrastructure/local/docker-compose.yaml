@@ -44,10 +44,20 @@ services:
       - "8180:8080"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
-    command: start-dev --import-realm
+      - ./keycloak/themes/skyroster:/opt/keycloak/themes/skyroster
+    # NOTE: --import-realm uses IGNORE_EXISTING strategy. Changes to realm-export.json
+    # are NOT re-applied on existing realms. To pick up changes locally, run:
+    #   docker compose down -v && docker compose --profile <profile> up -d
+    command: >
+      start-dev
+      --import-realm
+      --spi-theme-cache-themes=false
+      --spi-theme-cache-templates=false
+      --spi-theme-static-max-age=-1
     depends_on:
       postgres:
         condition: service_healthy
+    restart: on-failure:10
 
   frontend:
     build:
