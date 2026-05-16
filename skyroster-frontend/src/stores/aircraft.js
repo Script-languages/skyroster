@@ -66,13 +66,43 @@ export const useAircraftStore = defineStore('aircraft', () => {
     return null
   }
 
-  function deleteAircraft(id) {
-    const index = aircraft.value.findIndex(a => a.id === id)
-    if (index !== -1) {
-      aircraft.value.splice(index, 1)
-      return true
+  async function deleteAircraft(id) {
+    try {
+      const res = await apiClient.delete(
+        `http://localhost:8001/api/aircraft/${id}`,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (res.status >= 200 && res.status < 300) {
+        const index = aircraft.value.findIndex(a => a.id === id);
+
+        if (index !== -1) {
+          aircraft.value.splice(index, 1);
+        }
+
+        return {
+          success: true
+        };
+      }
+    } catch (error) {
+      console.error(error);
+
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          'Failed to delete aircraft'
+      };
     }
-    return false
+
+    return {
+      success: false,
+      message: 'Unexpected error occurred'
+    };
   }
 
   function getAircraftById(id) {

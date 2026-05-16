@@ -72,11 +72,27 @@ function confirmDelete(aircraft) {
     icon: 'pi pi-exclamation-triangle',
     acceptLabel: 'Tak, usuń',
     rejectLabel: 'Anuluj',
-    accept: () => {
-      aircraftStore.deleteAircraft(aircraft.id)
-      toast.add({ severity: 'success', summary: 'Sukces', detail: 'Samolot został usunięty', life: 3000 })
+
+    accept: async () => {
+      const result = await aircraftStore.deleteAircraft(aircraft.id);
+
+      if (result.success) {
+        toast.add({
+          severity: 'success',
+          summary: 'Sukces',
+          detail: 'Samolot został usunięty',
+          life: 3000
+        });
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Błąd',
+          detail: result.message,
+          life: 5000
+        });
+      }
     }
-  })
+  });
 }
 </script>
 
