@@ -17,11 +17,11 @@ export const AIRCRAFT_TYPES = [
 ]
 
 export const BASES = [
-  { label: 'Warszawa (EPWA)', value: 'EPWA' },
-  { label: 'Kraków (EPKK)', value: 'EPKK' },
-  { label: 'Gdańsk (EPGD)', value: 'EPGD' },
-  { label: 'Wrocław (EPWR)', value: 'EPWR' },
-  { label: 'Poznań (EPPO)', value: 'EPPO' }
+  { id: 'a0000000-0000-0000-0000-000000000001', label: 'Warszawa (EPWA)', icaoCode: 'EPWA', value: 'EPWA' },
+  { id: 'a0000000-0000-0000-0000-000000000002', label: 'Kraków (EPKK)',   icaoCode: 'EPKK', value: 'EPKK' },
+  { id: 'a0000000-0000-0000-0000-000000000003', label: 'Gdańsk (EPGD)',   icaoCode: 'EPGD', value: 'EPGD' },
+  { id: 'a0000000-0000-0000-0000-000000000004', label: 'Wrocław (EPWR)',  icaoCode: 'EPWR', value: 'EPWR' },
+  { id: 'a0000000-0000-0000-0000-000000000005', label: 'Poznań (EPPO)',   icaoCode: 'EPPO', value: 'EPPO' }
 ]
 
 export const AVAILABILITY_STATUSES = [
