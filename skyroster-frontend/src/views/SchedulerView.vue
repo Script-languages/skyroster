@@ -26,8 +26,7 @@ const selectedFlight = ref(null)
 const flightForm = ref(getEmptyForm())
 
 onMounted(async () => {
-  await aircraftStore.fetchAircraftList();
-  await flightsStore.loadPlanningSchedules()
+  await Promise.all([aircraftStore.fetchAircraftList(), flightsStore.loadPlanningSchedules()]);
 })
 
 const baseOptions = BASES.map(b => ({
