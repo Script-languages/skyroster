@@ -4,7 +4,7 @@ import apiClient from '../api/axios'
 import {AIRCRAFT_TYPES, AVAILABILITY_STATUSES, BASES} from '../data/mockData'
 
 async function getAircraftList() {
-  const res = await apiClient.get('http://localhost:8001/api/aircraft', {
+  const res = await apiClient.get('/aircraft', {
     headers: {
       'Content-Type': 'application/json'
     }
@@ -69,7 +69,7 @@ export const useAircraftStore = defineStore('aircraft', () => {
   async function deleteAircraft(id) {
     try {
       const res = await apiClient.delete(
-        `http://localhost:8001/api/aircraft/${id}`,
+        `/aircraft/${id}`,
         {
           headers: {
             'Content-Type': 'application/json'
