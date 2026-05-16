@@ -248,6 +248,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/rules:
+    get:
+      operationId: getRules
+      tags: [ Rules ]
+      summary: List operational rules
+      responses:
+        '200':
+          description: List of operational rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RuleResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/flights:
     get:
       operationId: displayFlights
@@ -792,6 +813,45 @@ components:
           $ref: '#/components/schemas/AircraftTypeInfo'
         operationalBase:
           $ref: '#/components/schemas/OperationalBaseInfo'
+
+    RuleType:
+      type: string
+      enum:
+        - MAX_WORK_TIME
+        - MIN_REST_TIME
+        - MIN_FLIGHT_TIME
+
+    RulePeriod:
+      type: string
+      enum:
+        - DAY
+        - WEEK
+        - MONTH
+
+    RuleResponse:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - value
+        - period
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/RuleType'
+        value:
+          type: integer
+          minimum: 1
+          description: Value in hours
+        period:
+          $ref: '#/components/schemas/RulePeriod'
+        description:
+          type: string
 
     FlightResponse:
       type: object
