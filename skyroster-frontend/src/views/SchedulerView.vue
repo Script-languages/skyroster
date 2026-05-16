@@ -35,6 +35,7 @@ onMounted(async () => {
     flightsStore.loadFlights(),
     flightsStore.loadPlanningSchedules()
   ])
+})
 
 async function onFlightCreated() {
   toast.add({ severity: 'success', summary: 'Sukces', detail: 'Lot został utworzony', life: 3000 })

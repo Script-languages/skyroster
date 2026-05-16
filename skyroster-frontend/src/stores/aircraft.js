@@ -1,7 +1,7 @@
 import {computed, ref} from 'vue'
 import {defineStore} from 'pinia'
 import apiClient from '../api/axios'
-import {initialAircraft, AIRCRAFT_TYPES, AVAILABILITY_STATUSES, BASES} from '../data/mockData'
+import {AIRCRAFT_TYPES, AVAILABILITY_STATUSES, BASES} from '../data/mockData'
 
 
 async function getAircraftList() {
