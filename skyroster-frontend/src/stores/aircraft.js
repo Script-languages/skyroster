@@ -1,19 +1,45 @@
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
-import { initialAircraft, AIRCRAFT_TYPES, BASES, AVAILABILITY_STATUSES } from '../data/mockData'
+import {computed, ref} from 'vue'
+import {defineStore} from 'pinia'
 import apiClient from '../api/axios'
+import {initialAircraft, AIRCRAFT_TYPES, AVAILABILITY_STATUSES, BASES} from '../data/mockData'
+
+
+async function getAircraftList() {
+  const res = await apiClient.get('/aircraft', {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return res.data;
+}
 
 export const useAircraftStore = defineStore('aircraft', () => {
-  const aircraft = ref([...initialAircraft])
+  const aircraft = ref([]);
   const aircraftTypeOptions = AIRCRAFT_TYPES
   const baseOptions = BASES
   const availabilityOptions = AVAILABILITY_STATUSES
 
   const aircraftCount = computed(() => aircraft.value.length)
-  
-  const availableAircraft = computed(() => 
+
+  const availableAircraft = computed(() =>
     aircraft.value.filter(a => a.dostepnosc === 'dostepny')
   )
+
+  async function fetchAircraftList() {
+    try {
+      const response = await getAircraftList();
+
+      aircraft.value = response.map(aircraft => ({
+        id: aircraft.id,
+        rejestracja: aircraft.registrationNumber,
+        typ: aircraft.aircraftType.icaoCode,
+        baza: aircraft.operationalBase.icaoCode
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   function generateId() {
     const maxId = aircraft.value.reduce((max, a) => {
@@ -41,13 +67,43 @@ export const useAircraftStore = defineStore('aircraft', () => {
     return null
   }
 
-  function deleteAircraft(id) {
-    const index = aircraft.value.findIndex(a => a.id === id)
-    if (index !== -1) {
-      aircraft.value.splice(index, 1)
-      return true
+  async function deleteAircraft(id) {
+    try {
+      const res = await apiClient.delete(
+        `/aircraft/${id}`,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (res.status >= 200 && res.status < 300) {
+        const index = aircraft.value.findIndex(a => a.id === id);
+
+        if (index !== -1) {
+          aircraft.value.splice(index, 1);
+        }
+
+        return {
+          success: true
+        };
+      }
+    } catch (error) {
+      console.error(error);
+
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          'Failed to delete aircraft'
+      };
     }
-    return false
+
+    return {
+      success: false,
+      message: 'Unexpected error occurred'
+    };
   }
 
   function getAircraftById(id) {
@@ -108,6 +164,7 @@ export const useAircraftStore = defineStore('aircraft', () => {
     getAircraftById,
     getAircraftDisplay,
     getAvailabilityInfo,
+    fetchAircraftList,
     loadAircraft,
     loadAvailableAircraft
   }
