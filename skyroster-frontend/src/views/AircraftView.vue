@@ -1,14 +1,14 @@
 <script setup>
 import {onMounted, ref} from 'vue'
-import { useAircraftStore } from '../stores/aircraft'
-import { useToast } from 'primevue/usetoast'
-import { useConfirm } from 'primevue/useconfirm'
+import {useAircraftStore} from '../stores/aircraft'
+import {useToast} from 'primevue/usetoast'
+import {useConfirm} from 'primevue/useconfirm'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
-import Tag from 'primevue/tag'
+// import Tag from 'primevue/tag'
 import AircraftDialog from '../components/aircraft/AircraftDialog.vue'
 
 const aircraftStore = useAircraftStore()
@@ -33,7 +33,7 @@ function getBaseLabel(baseCode) {
   return base ? base.label : baseCode
 }
 
-function getAvailabilitySeverity(status) {
+/*function getAvailabilitySeverity(status) {
   const info = aircraftStore.getAvailabilityInfo(status)
   return info ? info.severity : 'secondary'
 }
@@ -41,7 +41,7 @@ function getAvailabilitySeverity(status) {
 function getAvailabilityLabel(status) {
   const info = aircraftStore.getAvailabilityInfo(status)
   return info ? info.label : status
-}
+}*/
 
 function openAddDialog() {
   selectedAircraft.value = null
